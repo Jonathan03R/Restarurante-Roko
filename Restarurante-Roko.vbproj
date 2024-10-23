@@ -1,0 +1,337 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C7D4B1E5-BE6B-4E7E-BB00-784F92510FFB}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>Restarurante_Roko.My.MyApplication</StartupObject>
+    <RootNamespace>Restarurante_Roko</RootNamespace>
+    <AssemblyName>Restarurante-Roko</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>WindowsForms</MyType>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>Restarurante-Roko.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>Restarurante-Roko.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BouncyCastle.Cryptography, Version=2.0.0.0, Culture=neutral, PublicKeyToken=072edcf4a5328938, processorArchitecture=MSIL">
+      <HintPath>packages\BouncyCastle.Cryptography.2.4.0\lib\net461\BouncyCastle.Cryptography.dll</HintPath>
+    </Reference>
+    <Reference Include="itextsharp, Version=5.5.13.4, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>packages\iTextSharp.5.5.13.4\lib\net461\itextsharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Windows.Forms" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+    <Import Include="System.Threading.Tasks" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CapaAplicacion\ClienteNegocio.vb" />
+    <Compile Include="CapaAplicacion\DetallePedidoNegocio.vb" />
+    <Compile Include="CapaAplicacion\EmpleadosNegocio.vb" />
+    <Compile Include="CapaAplicacion\MenuNegocio.vb" />
+    <Compile Include="CapaAplicacion\MesaNegocio.vb" />
+    <Compile Include="CapaAplicacion\PedidoNegocio.vb" />
+    <Compile Include="CapaAplicacion\ReservaNegocio.vb" />
+    <Compile Include="CapaAplicacion\RolPermisoNegocio.vb" />
+    <Compile Include="CapaDominio\Entidades\Boleta.vb" />
+    <Compile Include="CapaDominio\Entidades\Cliente.vb" />
+    <Compile Include="CapaDominio\Entidades\DetallePedido.vb" />
+    <Compile Include="CapaDominio\Entidades\Empleado.vb" />
+    <Compile Include="CapaDominio\Entidades\Factura.vb" />
+    <Compile Include="CapaDominio\Entidades\HistorialPedido.vb" />
+    <Compile Include="CapaDominio\Entidades\Menu.vb" />
+    <Compile Include="CapaDominio\Entidades\Mesa.vb" />
+    <Compile Include="CapaDominio\Entidades\MesaReserva.vb" />
+    <Compile Include="CapaDominio\Entidades\Pago.vb" />
+    <Compile Include="CapaDominio\Entidades\Pedido.vb" />
+    <Compile Include="CapaDominio\Entidades\RolPermiso.vb" />
+    <Compile Include="CapaPersistencia\ModuloSecundarios\ClienteSQL.vb" />
+    <Compile Include="CapaPersistencia\ModuloSecundarios\CodigosSQL.vb" />
+    <Compile Include="CapaPersistencia\ModuloSecundarios\DetallePedidoSQL.vb" />
+    <Compile Include="CapaPersistencia\ModuloSecundarios\EmpleadoSQL.vb" />
+    <Compile Include="CapaPersistencia\ModuloSecundarios\HistorialSQL.vb" />
+    <Compile Include="CapaPersistencia\ModuloSecundarios\MenuSQL.vb" />
+    <Compile Include="CapaPersistencia\ModuloSecundarios\MesaSQL.vb" />
+    <Compile Include="CapaPersistencia\ModuloSecundarios\PedidoSQL.vb" />
+    <Compile Include="CapaPersistencia\ModuloSecundarios\ReservaSQL.vb" />
+    <Compile Include="CapaPersistencia\ModuloSecundarios\RolPermisoSQL.vb" />
+    <Compile Include="CapaPresentacion\Formularios\Finanzas\frmBoletas.Designer.vb">
+      <DependentUpon>frmBoletas.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Finanzas\frmBoletas.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Finanzas\frmFacturas.Designer.vb">
+      <DependentUpon>frmFacturas.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Finanzas\frmFacturas.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Finanzas\frmPagos.Designer.vb">
+      <DependentUpon>frmPagos.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Finanzas\frmPagos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Finanzas\frmPagosHistorial.Designer.vb">
+      <DependentUpon>frmPagosHistorial.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Finanzas\frmPagosHistorial.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Login.Designer.vb">
+      <DependentUpon>Login.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Login.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmClientes.Designer.vb">
+      <DependentUpon>frmClientes.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmClientes.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmClientesEliminados.Designer.vb">
+      <DependentUpon>frmClientesEliminados.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmClientesEliminados.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmEmpleados.Designer.vb">
+      <DependentUpon>frmEmpleados.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmEmpleados.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmEmpleadosEliminados.Designer.vb">
+      <DependentUpon>frmEmpleadosEliminados.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmEmpleadosEliminados.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmGestionarPedido.Designer.vb">
+      <DependentUpon>frmGestionarPedido.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmGestionarPedido.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmGraficaMesas.Designer.vb">
+      <DependentUpon>frmGraficaMesas.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmGraficaMesas.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmHistorialPedidos.Designer.vb">
+      <DependentUpon>frmHistorialPedidos.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmHistorialPedidos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmMenu.Designer.vb">
+      <DependentUpon>frmMenu.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmMenu.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmMenuEliminados.Designer.vb">
+      <DependentUpon>frmMenuEliminados.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmMenuEliminados.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmMesas.Designer.vb">
+      <DependentUpon>frmMesas.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmMesas.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmPedidos.Designer.vb">
+      <DependentUpon>frmPedidos.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmPedidos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmReservas.Designer.vb">
+      <DependentUpon>frmReservas.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Operaciones\frmReservas.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\PaginaPrincipal.Designer.vb">
+      <DependentUpon>PaginaPrincipal.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\PaginaPrincipal.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Soporte\frmAcercaDe.Designer.vb">
+      <DependentUpon>frmAcercaDe.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Soporte\frmAcercaDe.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Soporte\frmCentroDeAyuda.Designer.vb">
+      <DependentUpon>frmCentroDeAyuda.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CapaPresentacion\Formularios\Soporte\frmCentroDeAyuda.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CapaPersistencia\ModuloPrincipal\ModuloSistema.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Finanzas\frmBoletas.resx">
+      <DependentUpon>frmBoletas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Finanzas\frmFacturas.resx">
+      <DependentUpon>frmFacturas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Finanzas\frmPagos.resx">
+      <DependentUpon>frmPagos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Finanzas\frmPagosHistorial.resx">
+      <DependentUpon>frmPagosHistorial.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Login.resx">
+      <DependentUpon>Login.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Operaciones\frmClientes.resx">
+      <DependentUpon>frmClientes.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Operaciones\frmClientesEliminados.resx">
+      <DependentUpon>frmClientesEliminados.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Operaciones\frmEmpleados.resx">
+      <DependentUpon>frmEmpleados.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Operaciones\frmEmpleadosEliminados.resx">
+      <DependentUpon>frmEmpleadosEliminados.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Operaciones\frmGestionarPedido.resx">
+      <DependentUpon>frmGestionarPedido.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Operaciones\frmGraficaMesas.resx">
+      <DependentUpon>frmGraficaMesas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Operaciones\frmHistorialPedidos.resx">
+      <DependentUpon>frmHistorialPedidos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Operaciones\frmMenu.resx">
+      <DependentUpon>frmMenu.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Operaciones\frmMenuEliminados.resx">
+      <DependentUpon>frmMenuEliminados.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Operaciones\frmMesas.resx">
+      <DependentUpon>frmMesas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Operaciones\frmPedidos.resx">
+      <DependentUpon>frmPedidos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Operaciones\frmReservas.resx">
+      <DependentUpon>frmReservas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\PaginaPrincipal.resx">
+      <DependentUpon>PaginaPrincipal.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Soporte\frmAcercaDe.resx">
+      <DependentUpon>frmAcercaDe.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CapaPresentacion\Formularios\Soporte\frmCentroDeAyuda.resx">
+      <DependentUpon>frmCentroDeAyuda.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ascents\iconos\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ascents\imagenes\Restaurante.jpg" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+</Project>

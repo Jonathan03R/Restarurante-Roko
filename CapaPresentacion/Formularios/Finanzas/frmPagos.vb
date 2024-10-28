@@ -5,8 +5,8 @@ Imports System.IO
 Imports System.Diagnostics
 Public Class frmPagos
 
-    Dim clienteNegocio As New ClienteNegocio()
-    Dim pedidoNegocio As New PedidoNegocio()
+    Private procesoPagoServicio As New ProcesarPagoServicio()
+
     Private codigoCliente As String
     Private nombreCompleto As String
     Public Property MesaCodigo As String
@@ -19,7 +19,7 @@ Public Class frmPagos
         lblPedidoCodigo.Text = PedidoCodigo
         lblMontoTotal.Text = MontoTotal.ToString("C")
         lblEmpleadoCodigo.Text = "EMP00001"
-
+        'codCLi.Text = codigoCliente
         panelBoleta.Visible = True
         panelRuc.Visible = False
         CargarClientes()
@@ -46,12 +46,16 @@ Public Class frmPagos
     End Sub
 
     Private Sub CargarClientes(Optional textoBusqueda As String = "")
-        Dim clientesFiltrados As List(Of Cliente) = clienteNegocio.BuscarClientesPorNombre(textoBusqueda)
+        Dim clientesDataTable As DataTable = procesoPagoServicio.buscarClientesPorNombre(textoBusqueda)
+
         dgvClientes.Rows.Clear()
 
-        For Each cliente As Cliente In clientesFiltrados
-            Dim row As String() = {cliente.ClientesCodigo, cliente.ClientesNombreCompleto}
-            Dim index As Integer = dgvClientes.Rows.Add(row)
+        For Each row As DataRow In clientesDataTable.Rows
+            Dim cliente As New Cliente With {
+            .ClientesCodigo = row("ClientesCodigo").ToString(),
+            .ClientesNombreCompleto = row("ClientesNombreCompleto").ToString()
+        }
+            Dim index As Integer = dgvClientes.Rows.Add(row("ClientesCodigo").ToString(), row("ClientesNombreCompleto").ToString())
             dgvClientes.Rows(index).Tag = cliente
         Next
     End Sub
@@ -62,6 +66,7 @@ Public Class frmPagos
             Dim clienteSeleccionado As Cliente = CType(filaSeleccionada.Tag, Cliente)
             If clienteSeleccionado IsNot Nothing Then
                 codigoCliente = clienteSeleccionado.ClientesCodigo ' Almacenar código del cliente
+                codCLi.Text = clienteSeleccionado.ClientesCodigo
                 lblClienteNombre.Text = clienteSeleccionado.ClientesNombreCompleto ' Mostrar el nombre del cliente
             Else
                 MessageBox.Show("No se encontró la información completa del cliente.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -70,82 +75,32 @@ Public Class frmPagos
     End Sub
 
     Private Sub btnFinalizarPago_Click(sender As Object, e As EventArgs) Handles btnFinalizarPago.Click
-        Dim generarBoleta As Boolean = rbtnBoleta.Checked
-        Dim generarFactura As Boolean = rbtnFactura.Checked
-        Dim empleadoCodigo As String = lblEmpleadoCodigo.Text
-
-        ' Validaciones básicas
-        If String.IsNullOrEmpty(empleadoCodigo) Then
-            MessageBox.Show("El código de empleado no está configurado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Exit Sub
-        End If
-
-        If String.IsNullOrEmpty(MesaCodigo) Then
-            MessageBox.Show("El código de mesa no está configurado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Exit Sub
-        End If
-
-        If String.IsNullOrEmpty(PedidoCodigo) Then
-            MessageBox.Show("El código de pedido no está configurado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Exit Sub
-        End If
-
-        If generarBoleta AndAlso generarFactura Then
-            MessageBox.Show("No puede seleccionar boleta y factura al mismo tiempo.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Exit Sub
-        End If
-
-        ' Limpiar el monto eliminando el símbolo de moneda y convertirlo a decimal
-        Dim montoLimpio As String = lblMontoTotal.Text.Replace("S/ ", "").Trim()
-        Dim montoDecimal As Decimal
-        If Not Decimal.TryParse(montoLimpio, montoDecimal) Then
-            MessageBox.Show("El monto no es válido.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Exit Sub
-        End If
-
-        ' Información del cliente
-        Dim clienteNombreCompleto As String = Nothing
-        Dim clienteRUC As String = Nothing
-        Dim boletaClientesCodigo As String = codigoCliente ' Código del cliente para boleta
-        Dim boletaNombreCompletoCliente As String = lblClienteNombre.Text ' Nombre del cliente para boleta
-
-        ' Si es una factura, requerimos el nombre completo y el RUC
-        If generarFactura Then
-            clienteNombreCompleto = txtNombreCliente.Text
-            clienteRUC = txtRucCliente.Text
-
-            ' Validaciones específicas para factura
-            If String.IsNullOrEmpty(clienteNombreCompleto) OrElse String.IsNullOrEmpty(clienteRUC) Then
-                MessageBox.Show("Debe ingresar el nombre completo y RUC para la factura.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                Exit Sub
-            End If
-        End If
-
         Try
-            ' Generar el PDF correspondiente
-            If generarBoleta Then
-                GenerarBoletaPDF(boletaClientesCodigo, boletaNombreCompletoCliente, montoDecimal)
-            ElseIf generarFactura Then
-                GenerarFacturaPDF(clienteNombreCompleto, clienteRUC, montoDecimal)
-            Else
-                MessageBox.Show("Debe seleccionar Boleta o Factura.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                Exit Sub
-            End If
+            If Not ValidarEntradas() Then Exit Sub
 
-            ' Llamada al método de completar pago en la capa de negocio
-            pedidoNegocio.CompletarPago(
-                PedidoCodigo,
-                MesaCodigo,
-                empleadoCodigo,
-                montoDecimal,
-                generarBoleta,
-                generarFactura,
-                boletaClientesCodigo,
-                boletaNombreCompletoCliente,
-                clienteNombreCompleto,
-                clienteRUC,
-                MesaCodigo
-            )
+            Dim montoDecimal As Decimal = ObtenerMonto()
+            If montoDecimal <= 0 Then Exit Sub
+
+            Dim clienteInfo As Dictionary(Of String, String) = ObtenerInformacionCliente()
+            If clienteInfo Is Nothing Then Exit Sub
+
+            ' Llamada al método de completar pago en la capa de negocio y obtener el código generado
+            Dim codigoGenerado As String = procesoPagoServicio.CompletarPago(
+            PedidoCodigo,
+            MesaCodigo,
+            lblEmpleadoCodigo.Text,
+            montoDecimal,
+            rbtnBoleta.Checked,
+            rbtnFactura.Checked,
+            codigoCliente,
+            lblClienteNombre.Text,
+            clienteInfo("Nombre"),
+            clienteInfo("RUC"),
+            MesaCodigo
+        )
+
+            ' Obtener y generar el comprobante de pago
+            GenerarComprobante(PedidoCodigo)
 
             MessageBox.Show("Pago y finalización del pedido completados.")
             Me.Close()
@@ -154,6 +109,80 @@ Public Class frmPagos
         End Try
     End Sub
 
+    ' Método para validar las entradas básicas
+    Private Function ValidarEntradas() As Boolean
+        If String.IsNullOrEmpty(lblEmpleadoCodigo.Text) Then
+            MessageBox.Show("El código de empleado no está configurado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return False
+        End If
+
+        If String.IsNullOrEmpty(MesaCodigo) Then
+            MessageBox.Show("El código de mesa no está configurado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return False
+        End If
+
+        If String.IsNullOrEmpty(PedidoCodigo) Then
+            MessageBox.Show("El código de pedido no está configurado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return False
+        End If
+
+        If rbtnBoleta.Checked AndAlso rbtnFactura.Checked Then
+            MessageBox.Show("No puede seleccionar boleta y factura al mismo tiempo.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return False
+        End If
+
+        Return True
+    End Function
+
+    ' Método para obtener el monto y convertirlo a decimal
+    Private Function ObtenerMonto() As Decimal
+        Dim montoLimpio As String = lblMontoTotal.Text.Replace("S/ ", "").Trim()
+        Dim montoDecimal As Decimal
+
+        If Not Decimal.TryParse(montoLimpio, montoDecimal) Then
+            MessageBox.Show("El monto no es válido.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return 0
+        End If
+
+        Return montoDecimal
+    End Function
+
+    Private Function ObtenerInformacionCliente() As Dictionary(Of String, String)
+        Dim infoCliente As New Dictionary(Of String, String)
+
+        If rbtnFactura.Checked Then
+            Dim clienteNombreCompleto As String = txtNombreCliente.Text
+            Dim clienteRUC As String = txtRucCliente.Text
+
+            If String.IsNullOrEmpty(clienteNombreCompleto) OrElse String.IsNullOrEmpty(clienteRUC) Then
+                MessageBox.Show("Debe ingresar el nombre completo y RUC para la factura.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Return Nothing
+            End If
+
+            infoCliente("Nombre") = clienteNombreCompleto
+            infoCliente("RUC") = clienteRUC
+        Else
+            infoCliente("Nombre") = lblClienteNombre.Text
+            infoCliente("RUC") = ""
+        End If
+
+        Return infoCliente
+    End Function
+    ' Método para generar el comprobante de pago en formato PDF
+    Private Sub GenerarComprobante(pedidoCodigo As String)
+        Dim dtComprobante As DataTable = procesoPagoServicio.ObtenerComprobantePorPedido(pedidoCodigo)
+
+        If dtComprobante.Rows.Count > 0 Then
+            Dim tipoComprobante As String = dtComprobante.Rows(0)("TipoComprobante").ToString()
+            If tipoComprobante = "Boleta" Then
+                GenerarBoletaPDF(dtComprobante)
+            ElseIf tipoComprobante = "Factura" Then
+                GenerarFacturaPDF(dtComprobante)
+            End If
+        Else
+            MessageBox.Show("No se encontró un comprobante asociado al código de pedido especificado.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        End If
+    End Sub
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         Dim frmclientes As New frmClientes()
         AddHandler frmclientes.FormClosed, AddressOf ActualizarClientes
@@ -165,8 +194,94 @@ Public Class frmPagos
     End Sub
 
 
+    Private Sub AgregarCabeceraEmpresa(doc As Document)
+        ' Información de la empresa según tu solicitud
+        Dim titulo As New Paragraph("Restaurante Roko", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 20))
+        titulo.Alignment = Element.ALIGN_CENTER
+        doc.Add(titulo)
 
-    Private Sub GenerarBoletaPDF(clienteCodigo As String, clienteNombre As String, montoTotal As Decimal)
+        Dim subTitulo As New Paragraph("RUC: 10737782943", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12))
+        subTitulo.Alignment = Element.ALIGN_CENTER
+        doc.Add(subTitulo)
+
+        doc.Add(New Paragraph("Dirección: chao-viru", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+        doc.Add(New Paragraph("Teléfono: 999999999", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+        doc.Add(New Paragraph("Email: restauranteRoco@gmail.com", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+        doc.Add(New Paragraph(" ")) ' Espacio
+    End Sub
+
+    Private Sub AgregarTotales(doc As Document, row As DataRow)
+        doc.Add(New Paragraph(" "))
+        Dim tableTotales As New PdfPTable(2)
+        tableTotales.WidthPercentage = 40
+        tableTotales.HorizontalAlignment = Element.ALIGN_RIGHT
+        tableTotales.SetWidths(New Single() {2.0F, 1.0F})
+
+        tableTotales.AddCell(New Phrase("Total sin IGV:", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+        tableTotales.AddCell(New Phrase("S/ " & Convert.ToDecimal(row("TotalSinIGV")).ToString("F2"), FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+
+        tableTotales.AddCell(New Phrase("IGV (18%):", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+        tableTotales.AddCell(New Phrase("S/ " & Convert.ToDecimal(row("IGV")).ToString("F2"), FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+
+        tableTotales.AddCell(New Phrase("Total con IGV:", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
+        tableTotales.AddCell(New Phrase("S/ " & Convert.ToDecimal(row("TotalConIGV")).ToString("F2"), FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
+
+        doc.Add(tableTotales)
+    End Sub
+
+    Private Sub AgregarInformacionCliente(doc As Document, row As DataRow)
+        doc.Add(New Paragraph($"Fecha: {Convert.ToDateTime(row("Fecha")).ToString("dd/MM/yyyy")}", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+        doc.Add(New Paragraph($"Cliente: {row("NombreCliente").ToString()}", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+        If row.Table.Columns.Contains("RUCCliente") AndAlso Not String.IsNullOrEmpty(row("RUCCliente").ToString()) Then
+            doc.Add(New Paragraph($"RUC: {row("RUCCliente").ToString()}", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+        End If
+        doc.Add(New Paragraph(" ")) ' Espacio adicional
+    End Sub
+
+    Private Sub AgregarTablaDetalles(doc As Document, dtDetalles As DataTable)
+        ' Crear una tabla con 5 columnas: Item, Descripción, Cantidad, Precio Unitario, Precio Total
+        Dim table As New PdfPTable(5)
+        table.WidthPercentage = 100
+        table.SetWidths(New Single() {1.0F, 4.0F, 1.5F, 1.5F, 1.5F}) ' Anchos relativos de las columnas
+
+        ' Encabezados de la tabla
+        Dim cell As PdfPCell
+        cell = New PdfPCell(New Phrase("Item", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10)))
+        cell.HorizontalAlignment = Element.ALIGN_CENTER
+        table.AddCell(cell)
+
+        cell = New PdfPCell(New Phrase("Descripción", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10)))
+        cell.HorizontalAlignment = Element.ALIGN_CENTER
+        table.AddCell(cell)
+
+        cell = New PdfPCell(New Phrase("Cantidad", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10)))
+        cell.HorizontalAlignment = Element.ALIGN_CENTER
+        table.AddCell(cell)
+
+        cell = New PdfPCell(New Phrase("Precio Unit.", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10)))
+        cell.HorizontalAlignment = Element.ALIGN_CENTER
+        table.AddCell(cell)
+
+        cell = New PdfPCell(New Phrase("Precio Total", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10)))
+        cell.HorizontalAlignment = Element.ALIGN_CENTER
+        table.AddCell(cell)
+
+        ' Agregar filas con los detalles
+        Dim itemIndex As Integer = 1
+        For Each detalleRow As DataRow In dtDetalles.Rows
+            table.AddCell(New Phrase(itemIndex.ToString(), FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+            table.AddCell(New Phrase(detalleRow("MenuNombre").ToString(), FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+            table.AddCell(New Phrase(detalleRow("DetallesPedidoCantidad").ToString(), FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+            table.AddCell(New Phrase(Convert.ToDecimal(detalleRow("DetallesPedidoPrecio")).ToString("F2"), FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+            table.AddCell(New Phrase(Convert.ToDecimal(detalleRow("Total")).ToString("F2"), FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+            itemIndex += 1
+        Next
+
+        doc.Add(table)
+    End Sub
+
+    ' Método para generar el PDF de la boleta
+    Private Sub GenerarBoletaPDF(dtComprobante As DataTable)
         Dim nombreArchivo As String = "Boleta_" & PedidoCodigo & ".pdf"
         Dim rutaArchivo As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), nombreArchivo)
 
@@ -175,59 +290,34 @@ Public Class frmPagos
             PdfWriter.GetInstance(doc, New FileStream(rutaArchivo, FileMode.Create))
             doc.Open()
 
-            ' Agregar contenido al documento
-            doc.Add(New Paragraph("BOLETA DE VENTA", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16)))
-            doc.Add(New Paragraph(" "))
+            Dim row As DataRow = dtComprobante.Rows(0)
 
-            doc.Add(New Paragraph("Código de Boleta: " & PedidoCodigo))
-            doc.Add(New Paragraph("Fecha: " & DateTime.Now.ToString("dd/MM/yyyy")))
-            doc.Add(New Paragraph("Cliente: " & clienteNombre))
-            doc.Add(New Paragraph("Código Cliente: " & clienteCodigo))
-            doc.Add(New Paragraph(" "))
+            ' Agregar secciones al documento
+            AgregarCabeceraEmpresa(doc)
+            Dim tituloComprobante As New Paragraph("BOLETA DE VENTA", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16))
+            tituloComprobante.Alignment = Element.ALIGN_CENTER
+            doc.Add(tituloComprobante)
+            doc.Add(New Paragraph("Código de Boleta: " & row("CodigoComprobante").ToString(), FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
+            doc.Add(New Paragraph(" ")) ' Espacio
+            AgregarInformacionCliente(doc, row)
 
-            ' Tabla para los detalles del pedido
-            Dim tabla As New PdfPTable(4)
-            tabla.WidthPercentage = 100
-            tabla.SetWidths(New Single() {40, 20, 20, 20})
+            ' Obtener y agregar los detalles del pedido
+            Dim dtDetalles As DataTable = procesoPagoServicio.ObtenerDetallesPedido(PedidoCodigo)
+            AgregarTablaDetalles(doc, dtDetalles)
 
-            ' Encabezados de la tabla
-            tabla.AddCell(New Phrase("Producto", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
-            tabla.AddCell(New Phrase("Cantidad", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
-            tabla.AddCell(New Phrase("Precio Unitario", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
-            tabla.AddCell(New Phrase("Total", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
-
-            ' Obtener los detalles del pedido desde la base de datos
-            Dim detalleNegocio As New DetallePedidoNegocio()
-            Dim listaDetalles As List(Of DetallePedido) = detalleNegocio.ObtenerDetallesPedido(PedidoCodigo)
-
-            ' Agregar los detalles a la tabla
-            For Each detalle In listaDetalles
-                tabla.AddCell(detalle.Menu.MenuNombre)
-                tabla.AddCell(detalle.DetallesPedidoCantidad.ToString())
-                tabla.AddCell("S/ " & detalle.DetallesPedidoPrecio.ToString("F2"))
-                Dim totalDetalle As Decimal = detalle.DetallesPedidoCantidad * detalle.DetallesPedidoPrecio
-                tabla.AddCell("S/ " & totalDetalle.ToString("F2"))
-            Next
-
-            doc.Add(tabla)
-            doc.Add(New Paragraph(" "))
-
-            ' Total
-            doc.Add(New Paragraph("Monto Total: S/ " & montoTotal.ToString("F2"), FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
+            ' Agregar totales
+            AgregarTotales(doc, row)
 
             doc.Close()
-
-            ' Abrir el archivo PDF automáticamente
             Process.Start(rutaArchivo)
-
             MessageBox.Show("Boleta generada correctamente en: " & rutaArchivo)
         Catch ex As Exception
-            MessageBox.Show("Error al generar la boleta: " & ex.Message)
+            Throw New Exception("Error al generar la boleta: " & ex.Message)
         End Try
     End Sub
 
-    ' Método para generar la factura en PDF
-    Private Sub GenerarFacturaPDF(clienteNombre As String, clienteRUC As String, montoTotal As Decimal)
+    ' Método para generar el PDF de la factura
+    Private Sub GenerarFacturaPDF(dtComprobante As DataTable)
         Dim nombreArchivo As String = "Factura_" & PedidoCodigo & ".pdf"
         Dim rutaArchivo As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), nombreArchivo)
 
@@ -236,54 +326,30 @@ Public Class frmPagos
             PdfWriter.GetInstance(doc, New FileStream(rutaArchivo, FileMode.Create))
             doc.Open()
 
-            ' Agregar contenido al documento
-            doc.Add(New Paragraph("FACTURA", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16)))
-            doc.Add(New Paragraph(" "))
+            Dim row As DataRow = dtComprobante.Rows(0)
 
-            doc.Add(New Paragraph("Código de Factura: " & PedidoCodigo))
-            doc.Add(New Paragraph("Fecha: " & DateTime.Now.ToString("dd/MM/yyyy")))
-            doc.Add(New Paragraph("Cliente: " & clienteNombre))
-            doc.Add(New Paragraph("RUC: " & clienteRUC))
-            doc.Add(New Paragraph(" "))
+            ' Agregar secciones al documento
+            AgregarCabeceraEmpresa(doc)
+            Dim tituloComprobante As New Paragraph("FACTURA", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16))
+            tituloComprobante.Alignment = Element.ALIGN_CENTER
+            doc.Add(tituloComprobante)
+            doc.Add(New Paragraph("Código de Factura: " & row("CodigoComprobante").ToString(), FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
+            doc.Add(New Paragraph(" ")) ' Espacio
+            AgregarInformacionCliente(doc, row)
 
-            ' Tabla para los detalles del pedido
-            Dim tabla As New PdfPTable(4)
-            tabla.WidthPercentage = 100
-            tabla.SetWidths(New Single() {40, 20, 20, 20})
+            ' Obtener y agregar los detalles del pedido
+            Dim dtDetalles As DataTable = procesoPagoServicio.ObtenerDetallesPedido(PedidoCodigo)
+            AgregarTablaDetalles(doc, dtDetalles)
 
-            ' Encabezados de la tabla
-            tabla.AddCell(New Phrase("Producto", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
-            tabla.AddCell(New Phrase("Cantidad", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
-            tabla.AddCell(New Phrase("Precio Unitario", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
-            tabla.AddCell(New Phrase("Total", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
-
-            ' Obtener los detalles del pedido desde la base de datos
-            Dim detalleNegocio As New DetallePedidoNegocio()
-            Dim listaDetalles As List(Of DetallePedido) = detalleNegocio.ObtenerDetallesPedido(PedidoCodigo)
-
-            ' Agregar los detalles a la tabla
-            For Each detalle In listaDetalles
-                tabla.AddCell(detalle.Menu.MenuNombre)
-                tabla.AddCell(detalle.DetallesPedidoCantidad.ToString())
-                tabla.AddCell("S/ " & detalle.DetallesPedidoPrecio.ToString("F2"))
-                Dim totalDetalle As Decimal = detalle.DetallesPedidoCantidad * detalle.DetallesPedidoPrecio
-                tabla.AddCell("S/ " & totalDetalle.ToString("F2"))
-            Next
-
-            doc.Add(tabla)
-            doc.Add(New Paragraph(" "))
-
-            ' Total
-            doc.Add(New Paragraph("Monto Total: S/ " & montoTotal.ToString("F2"), FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
+            ' Agregar totales
+            AgregarTotales(doc, row)
 
             doc.Close()
-
-            ' Abrir el archivo PDF automáticamente
             Process.Start(rutaArchivo)
-
             MessageBox.Show("Factura generada correctamente en: " & rutaArchivo)
         Catch ex As Exception
-            MessageBox.Show("Error al generar la factura: " & ex.Message)
+            Throw New Exception("Error al generar la factura: " & ex.Message)
         End Try
     End Sub
+
 End Class

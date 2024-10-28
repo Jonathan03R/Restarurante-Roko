@@ -33,11 +33,11 @@ Partial Class frmPedidos
         Me.lblPrecio = New System.Windows.Forms.Label()
         Me.Label6 = New System.Windows.Forms.Label()
         Me.dgvDetallesPedido = New System.Windows.Forms.DataGridView()
+        Me.btnAgregarProducto = New System.Windows.Forms.Button()
         Me.producto = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Column1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Column2 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Column3 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.btnAgregarProducto = New System.Windows.Forms.Button()
         CType(Me.dgvDetallesPedido, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -143,26 +143,6 @@ Partial Class frmPedidos
         Me.dgvDetallesPedido.Size = New System.Drawing.Size(431, 380)
         Me.dgvDetallesPedido.TabIndex = 36
         '
-        'producto
-        '
-        Me.producto.HeaderText = "producto"
-        Me.producto.Name = "producto"
-        '
-        'Column1
-        '
-        Me.Column1.HeaderText = "precio"
-        Me.Column1.Name = "Column1"
-        '
-        'Column2
-        '
-        Me.Column2.HeaderText = "cantidad"
-        Me.Column2.Name = "Column2"
-        '
-        'Column3
-        '
-        Me.Column3.HeaderText = "total"
-        Me.Column3.Name = "Column3"
-        '
         'btnAgregarProducto
         '
         Me.btnAgregarProducto.Location = New System.Drawing.Point(374, 30)
@@ -171,6 +151,30 @@ Partial Class frmPedidos
         Me.btnAgregarProducto.TabIndex = 37
         Me.btnAgregarProducto.Text = "Agregar Producto"
         Me.btnAgregarProducto.UseVisualStyleBackColor = True
+        '
+        'producto
+        '
+        Me.producto.DataPropertyName = "MenuNombre"
+        Me.producto.HeaderText = "producto"
+        Me.producto.Name = "producto"
+        '
+        'Column1
+        '
+        Me.Column1.DataPropertyName = "DetallesPedidoPrecio"
+        Me.Column1.HeaderText = "precio"
+        Me.Column1.Name = "Column1"
+        '
+        'Column2
+        '
+        Me.Column2.DataPropertyName = "DetallesPedidoCantidad"
+        Me.Column2.HeaderText = "cantidad"
+        Me.Column2.Name = "Column2"
+        '
+        'Column3
+        '
+        Me.Column3.DataPropertyName = "Total"
+        Me.Column3.HeaderText = "total"
+        Me.Column3.Name = "Column3"
         '
         'frmPedidos
         '
@@ -207,9 +211,9 @@ Partial Class frmPedidos
     Friend WithEvents lblPrecio As Label
     Friend WithEvents Label6 As Label
     Friend WithEvents dgvDetallesPedido As DataGridView
+    Friend WithEvents btnAgregarProducto As Button
     Friend WithEvents producto As DataGridViewTextBoxColumn
     Friend WithEvents Column1 As DataGridViewTextBoxColumn
     Friend WithEvents Column2 As DataGridViewTextBoxColumn
     Friend WithEvents Column3 As DataGridViewTextBoxColumn
-    Friend WithEvents btnAgregarProducto As Button
 End Class

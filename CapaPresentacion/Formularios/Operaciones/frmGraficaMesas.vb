@@ -1,34 +1,34 @@
 ﻿Public Class frmGraficaMesas
-    Private listaMesas As List(Of Mesa)
-    Dim mesaNegocio As New MesaNegocio()
-
-    ' Método que carga las mesas gráficamente
+    'Private listaMesas As List(Of Mesa)
+    'Dim mesaNegocio As New MesaNegocio()
+    Dim procesarPedido As New ProcesarPedidoServicio()
+    Private listaMesas As DataTable
     Private Sub frmGraficaMesas_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         cargarMesasGraficamente()
     End Sub
 
     ' Cargar las mesas gráficamente y asignarles el estado correspondiente
     Private Sub cargarMesasGraficamente()
-        listaMesas = mesaNegocio.ObtenerMesas()
+        ' Obtener las mesas activas desde el servicio
+        listaMesas = procesarPedido.ObtenerMesas()
+
         FlowLayoutPanel1.Controls.Clear()
 
-        For Each mesa In listaMesas
-            Dim btnMesa As New Button()
-            btnMesa.Width = 100
-            btnMesa.Height = 100
-            btnMesa.Text = mesa.MesasCodigo
+        For Each row As DataRow In listaMesas.Rows
+            Dim btnMesa As New Button() With {
+                .Width = 100,
+                .Height = 100,
+                .Text = row("MesasCodigo").ToString()
+            }
 
-            ' Cambiar el color del botón según el estado de la mesa
-            Select Case mesa.MesasEstado
-                Case "Vacío"
+            Select Case row("MesasEstado").ToString()
+                Case "V" ' Vacío
                     btnMesa.BackColor = Color.Green
-                Case "Reservado"
+                Case "R" ' Reservado
                     btnMesa.BackColor = Color.Orange
-                Case "Ocupado"
+                Case "O" ' Ocupado
                     btnMesa.BackColor = Color.Red
             End Select
-
-            ' Añadir el evento Click para cada botón
             AddHandler btnMesa.Click, AddressOf btnMesa_Click
 
             FlowLayoutPanel1.Controls.Add(btnMesa)
@@ -37,22 +37,24 @@
 
     Private Sub btnMesa_Click(sender As Object, e As EventArgs)
         Dim btnMesa As Button = CType(sender, Button)
-        Dim mesaSeleccionada = listaMesas.FirstOrDefault(Function(mesa) mesa.MesasCodigo = btnMesa.Text)
+        Dim mesaSeleccionada As DataRow = listaMesas.Select($"MesasCodigo = '{btnMesa.Text}'").FirstOrDefault()
 
-        If mesaSeleccionada.MesasEstado = "Vacío" Then
-            Dim frmPedidos As New frmPedidos()
-            frmPedidos.MesaCodigo = btnMesa.Text
-            frmPedidos.ShowDialog()
+        If mesaSeleccionada IsNot Nothing Then
+            Select Case mesaSeleccionada("MesasEstado").ToString()
+                Case "V" ' Vacío
+                    Dim frmPedidos As New frmPedidos()
+                    frmPedidos.MesaCodigo = btnMesa.Text
+                    frmPedidos.ShowDialog()
 
-        ElseIf mesaSeleccionada.MesasEstado = "Ocupado" Then
+                Case "O" ' Ocupado
+                    Dim frmGestionarPedido As New frmGestionarPedido()
+                    frmGestionarPedido.MesaCodigo = btnMesa.Text
+                    frmGestionarPedido.ShowDialog()
+            End Select
 
-            Dim frmGestionarPedido As New frmGestionarPedido()
-            frmGestionarPedido.MesaCodigo = btnMesa.Text
-            frmGestionarPedido.ShowDialog()
-
+            ' Recargar las mesas después de realizar cualquier cambio
+            cargarMesasGraficamente()
         End If
-
-        cargarMesasGraficamente()
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click

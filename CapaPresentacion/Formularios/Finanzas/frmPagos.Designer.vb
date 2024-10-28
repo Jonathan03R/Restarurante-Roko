@@ -46,10 +46,10 @@ Partial Class frmPagos
         Me.lblClienteNombre = New System.Windows.Forms.Label()
         Me.panelBoleta = New System.Windows.Forms.Panel()
         Me.panelRuc = New System.Windows.Forms.Panel()
-        Me.txtRucCliente = New System.Windows.Forms.TextBox()
-        Me.Label7 = New System.Windows.Forms.Label()
-        Me.txtNombreCliente = New System.Windows.Forms.TextBox()
         Me.Cliente = New System.Windows.Forms.Label()
+        Me.txtNombreCliente = New System.Windows.Forms.TextBox()
+        Me.Label7 = New System.Windows.Forms.Label()
+        Me.txtRucCliente = New System.Windows.Forms.TextBox()
         CType(Me.dgvClientes, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -102,12 +102,14 @@ Partial Class frmPagos
         '
         'DataGridViewTextBoxColumn1
         '
+        Me.DataGridViewTextBoxColumn1.DataPropertyName = "ClientesCodigo"
         Me.DataGridViewTextBoxColumn1.HeaderText = "codigo"
         Me.DataGridViewTextBoxColumn1.Name = "DataGridViewTextBoxColumn1"
         Me.DataGridViewTextBoxColumn1.ReadOnly = True
         '
         'DataGridViewTextBoxColumn2
         '
+        Me.DataGridViewTextBoxColumn2.DataPropertyName = "ClientesNombreCompleto"
         Me.DataGridViewTextBoxColumn2.HeaderText = "Nombre De Cliente"
         Me.DataGridViewTextBoxColumn2.Name = "DataGridViewTextBoxColumn2"
         Me.DataGridViewTextBoxColumn2.ReadOnly = True
@@ -118,9 +120,9 @@ Partial Class frmPagos
         Me.codCLi.AutoSize = True
         Me.codCLi.Location = New System.Drawing.Point(151, 43)
         Me.codCLi.Name = "codCLi"
-        Me.codCLi.Size = New System.Drawing.Size(39, 13)
+        Me.codCLi.Size = New System.Drawing.Size(13, 13)
         Me.codCLi.TabIndex = 42
-        Me.codCLi.Text = "Label4"
+        Me.codCLi.Text = "--"
         '
         'btnFinalizarPago
         '
@@ -272,6 +274,7 @@ Partial Class frmPagos
         Me.lblClienteNombre.Size = New System.Drawing.Size(39, 13)
         Me.lblClienteNombre.TabIndex = 57
         Me.lblClienteNombre.Text = "Label7"
+        Me.lblClienteNombre.Visible = False
         '
         'panelBoleta
         '
@@ -295,12 +298,21 @@ Partial Class frmPagos
         Me.panelRuc.Size = New System.Drawing.Size(538, 127)
         Me.panelRuc.TabIndex = 59
         '
-        'txtRucCliente
+        'Cliente
         '
-        Me.txtRucCliente.Location = New System.Drawing.Point(101, 19)
-        Me.txtRucCliente.Name = "txtRucCliente"
-        Me.txtRucCliente.Size = New System.Drawing.Size(236, 20)
-        Me.txtRucCliente.TabIndex = 0
+        Me.Cliente.AutoSize = True
+        Me.Cliente.Location = New System.Drawing.Point(41, 67)
+        Me.Cliente.Name = "Cliente"
+        Me.Cliente.Size = New System.Drawing.Size(39, 13)
+        Me.Cliente.TabIndex = 3
+        Me.Cliente.Text = "Cliente"
+        '
+        'txtNombreCliente
+        '
+        Me.txtNombreCliente.Location = New System.Drawing.Point(101, 60)
+        Me.txtNombreCliente.Name = "txtNombreCliente"
+        Me.txtNombreCliente.Size = New System.Drawing.Size(336, 20)
+        Me.txtNombreCliente.TabIndex = 2
         '
         'Label7
         '
@@ -311,21 +323,12 @@ Partial Class frmPagos
         Me.Label7.TabIndex = 1
         Me.Label7.Text = "ruc"
         '
-        'txtNombreCliente
+        'txtRucCliente
         '
-        Me.txtNombreCliente.Location = New System.Drawing.Point(101, 60)
-        Me.txtNombreCliente.Name = "txtNombreCliente"
-        Me.txtNombreCliente.Size = New System.Drawing.Size(336, 20)
-        Me.txtNombreCliente.TabIndex = 2
-        '
-        'Cliente
-        '
-        Me.Cliente.AutoSize = True
-        Me.Cliente.Location = New System.Drawing.Point(41, 67)
-        Me.Cliente.Name = "Cliente"
-        Me.Cliente.Size = New System.Drawing.Size(39, 13)
-        Me.Cliente.TabIndex = 3
-        Me.Cliente.Text = "Cliente"
+        Me.txtRucCliente.Location = New System.Drawing.Point(101, 19)
+        Me.txtRucCliente.Name = "txtRucCliente"
+        Me.txtRucCliente.Size = New System.Drawing.Size(236, 20)
+        Me.txtRucCliente.TabIndex = 0
         '
         'frmPagos
         '
@@ -357,8 +360,6 @@ Partial Class frmPagos
     Friend WithEvents Label5 As Label
     Friend WithEvents txtBuscar As TextBox
     Friend WithEvents dgvClientes As DataGridView
-    Friend WithEvents DataGridViewTextBoxColumn1 As DataGridViewTextBoxColumn
-    Friend WithEvents DataGridViewTextBoxColumn2 As DataGridViewTextBoxColumn
     Friend WithEvents codCLi As Label
     Friend WithEvents btnFinalizarPago As Button
     Friend WithEvents lblMontoTotal As Label
@@ -381,4 +382,6 @@ Partial Class frmPagos
     Friend WithEvents txtRucCliente As TextBox
     Friend WithEvents Cliente As Label
     Friend WithEvents txtNombreCliente As TextBox
+    Friend WithEvents DataGridViewTextBoxColumn1 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn2 As DataGridViewTextBoxColumn
 End Class

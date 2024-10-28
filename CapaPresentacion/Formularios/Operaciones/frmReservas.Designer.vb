@@ -26,12 +26,6 @@ Partial Class frmReservas
         Me.btnactualizar = New System.Windows.Forms.Button()
         Me.btnsave = New System.Windows.Forms.Button()
         Me.tabla = New System.Windows.Forms.DataGridView()
-        Me.Codigo = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Clientes = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Mesa = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Column1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Fecha_registrada = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Column2 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.datefecha = New System.Windows.Forms.DateTimePicker()
         Me.comboMesas = New System.Windows.Forms.ComboBox()
@@ -41,7 +35,7 @@ Partial Class frmReservas
         Me.txtcodigo = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.dgvClientes = New System.Windows.Forms.DataGridView()
-        Me.DataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.CodigoCliente = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.DataGridViewTextBoxColumn2 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.txtBuscar = New System.Windows.Forms.TextBox()
         Me.Label5 = New System.Windows.Forms.Label()
@@ -55,6 +49,14 @@ Partial Class frmReservas
         Me.chkPendiente = New System.Windows.Forms.CheckBox()
         Me.chkExpirada = New System.Windows.Forms.CheckBox()
         Me.chkFinalizada = New System.Windows.Forms.CheckBox()
+        Me.ReservasCodigo = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.NombreCliente = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ReservasMesasCodigo = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ReservasEstado = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.FechaReserva = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ReservasFechaHoraReserva = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ClienteCodigo = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.CodigoMesa = New System.Windows.Forms.DataGridViewTextBoxColumn()
         CType(Me.tabla, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.dgvClientes, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -94,7 +96,7 @@ Partial Class frmReservas
         Me.tabla.AllowUserToAddRows = False
         Me.tabla.AllowUserToDeleteRows = False
         Me.tabla.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.tabla.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Codigo, Me.Clientes, Me.Mesa, Me.Column1, Me.Fecha_registrada, Me.Column2})
+        Me.tabla.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.ReservasCodigo, Me.NombreCliente, Me.ReservasMesasCodigo, Me.ReservasEstado, Me.FechaReserva, Me.ReservasFechaHoraReserva, Me.ClienteCodigo, Me.CodigoMesa})
         Me.tabla.Location = New System.Drawing.Point(36, 282)
         Me.tabla.Margin = New System.Windows.Forms.Padding(2)
         Me.tabla.MultiSelect = False
@@ -106,43 +108,6 @@ Partial Class frmReservas
         Me.tabla.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
         Me.tabla.Size = New System.Drawing.Size(549, 206)
         Me.tabla.TabIndex = 23
-        '
-        'Codigo
-        '
-        Me.Codigo.HeaderText = "codigo"
-        Me.Codigo.Name = "Codigo"
-        Me.Codigo.ReadOnly = True
-        '
-        'Clientes
-        '
-        Me.Clientes.HeaderText = "Clientes"
-        Me.Clientes.Name = "Clientes"
-        Me.Clientes.ReadOnly = True
-        Me.Clientes.Width = 200
-        '
-        'Mesa
-        '
-        Me.Mesa.HeaderText = "Mesa"
-        Me.Mesa.Name = "Mesa"
-        Me.Mesa.ReadOnly = True
-        '
-        'Column1
-        '
-        Me.Column1.HeaderText = "Estado mesa"
-        Me.Column1.Name = "Column1"
-        Me.Column1.ReadOnly = True
-        '
-        'Fecha_registrada
-        '
-        Me.Fecha_registrada.HeaderText = "Fecha reserva"
-        Me.Fecha_registrada.Name = "Fecha_registrada"
-        Me.Fecha_registrada.ReadOnly = True
-        '
-        'Column2
-        '
-        Me.Column2.HeaderText = "Hora de reserva"
-        Me.Column2.Name = "Column2"
-        Me.Column2.ReadOnly = True
         '
         'Label4
         '
@@ -227,7 +192,7 @@ Partial Class frmReservas
         Me.dgvClientes.AllowUserToAddRows = False
         Me.dgvClientes.AllowUserToDeleteRows = False
         Me.dgvClientes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgvClientes.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.DataGridViewTextBoxColumn1, Me.DataGridViewTextBoxColumn2})
+        Me.dgvClientes.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.CodigoCliente, Me.DataGridViewTextBoxColumn2})
         Me.dgvClientes.Location = New System.Drawing.Point(609, 74)
         Me.dgvClientes.Margin = New System.Windows.Forms.Padding(2)
         Me.dgvClientes.MultiSelect = False
@@ -240,14 +205,16 @@ Partial Class frmReservas
         Me.dgvClientes.Size = New System.Drawing.Size(434, 276)
         Me.dgvClientes.TabIndex = 30
         '
-        'DataGridViewTextBoxColumn1
+        'CodigoCliente
         '
-        Me.DataGridViewTextBoxColumn1.HeaderText = "codigo"
-        Me.DataGridViewTextBoxColumn1.Name = "DataGridViewTextBoxColumn1"
-        Me.DataGridViewTextBoxColumn1.ReadOnly = True
+        Me.CodigoCliente.DataPropertyName = "ClientesCodigo"
+        Me.CodigoCliente.HeaderText = "codigo"
+        Me.CodigoCliente.Name = "CodigoCliente"
+        Me.CodigoCliente.ReadOnly = True
         '
         'DataGridViewTextBoxColumn2
         '
+        Me.DataGridViewTextBoxColumn2.DataPropertyName = "ClientesNombreCompleto"
         Me.DataGridViewTextBoxColumn2.HeaderText = "Nombre De Cliente"
         Me.DataGridViewTextBoxColumn2.Name = "DataGridViewTextBoxColumn2"
         Me.DataGridViewTextBoxColumn2.ReadOnly = True
@@ -367,6 +334,65 @@ Partial Class frmReservas
         Me.chkFinalizada.Text = "Finalizada"
         Me.chkFinalizada.UseVisualStyleBackColor = True
         '
+        'ReservasCodigo
+        '
+        Me.ReservasCodigo.DataPropertyName = "ReservasCodigo"
+        Me.ReservasCodigo.HeaderText = "codigo"
+        Me.ReservasCodigo.Name = "ReservasCodigo"
+        Me.ReservasCodigo.ReadOnly = True
+        '
+        'NombreCliente
+        '
+        Me.NombreCliente.DataPropertyName = "NombreCliente"
+        Me.NombreCliente.HeaderText = "Clientes"
+        Me.NombreCliente.Name = "NombreCliente"
+        Me.NombreCliente.ReadOnly = True
+        Me.NombreCliente.Width = 200
+        '
+        'ReservasMesasCodigo
+        '
+        Me.ReservasMesasCodigo.DataPropertyName = "ReservasMesasCodigo"
+        Me.ReservasMesasCodigo.HeaderText = "Mesa"
+        Me.ReservasMesasCodigo.Name = "ReservasMesasCodigo"
+        Me.ReservasMesasCodigo.ReadOnly = True
+        '
+        'ReservasEstado
+        '
+        Me.ReservasEstado.DataPropertyName = "EstadoReserva"
+        Me.ReservasEstado.HeaderText = "Estado reserva"
+        Me.ReservasEstado.Name = "ReservasEstado"
+        Me.ReservasEstado.ReadOnly = True
+        '
+        'FechaReserva
+        '
+        Me.FechaReserva.DataPropertyName = "FechaReserva"
+        Me.FechaReserva.HeaderText = "Fecha reserva"
+        Me.FechaReserva.Name = "FechaReserva"
+        Me.FechaReserva.ReadOnly = True
+        '
+        'ReservasFechaHoraReserva
+        '
+        Me.ReservasFechaHoraReserva.DataPropertyName = "HoraReserva"
+        Me.ReservasFechaHoraReserva.HeaderText = "Hora de reserva"
+        Me.ReservasFechaHoraReserva.Name = "ReservasFechaHoraReserva"
+        Me.ReservasFechaHoraReserva.ReadOnly = True
+        '
+        'ClienteCodigo
+        '
+        Me.ClienteCodigo.DataPropertyName = "ReservasClientesCodigo"
+        Me.ClienteCodigo.HeaderText = "Codigo Cliente"
+        Me.ClienteCodigo.Name = "ClienteCodigo"
+        Me.ClienteCodigo.ReadOnly = True
+        Me.ClienteCodigo.Visible = False
+        '
+        'CodigoMesa
+        '
+        Me.CodigoMesa.DataPropertyName = "ReservasMesasCodigo"
+        Me.CodigoMesa.HeaderText = "Codigo Mesa"
+        Me.CodigoMesa.Name = "CodigoMesa"
+        Me.CodigoMesa.ReadOnly = True
+        Me.CodigoMesa.Visible = False
+        '
         'frmReservas
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -418,19 +444,11 @@ Partial Class frmReservas
     Friend WithEvents txtcodigo As TextBox
     Friend WithEvents Label1 As Label
     Friend WithEvents dgvClientes As DataGridView
-    Friend WithEvents DataGridViewTextBoxColumn1 As DataGridViewTextBoxColumn
-    Friend WithEvents DataGridViewTextBoxColumn2 As DataGridViewTextBoxColumn
     Friend WithEvents txtBuscar As TextBox
     Friend WithEvents Label5 As Label
     Friend WithEvents Button1 As Button
     Friend WithEvents combEstadoReserva As ComboBox
     Friend WithEvents labelEstado As Label
-    Friend WithEvents Codigo As DataGridViewTextBoxColumn
-    Friend WithEvents Clientes As DataGridViewTextBoxColumn
-    Friend WithEvents Mesa As DataGridViewTextBoxColumn
-    Friend WithEvents Column1 As DataGridViewTextBoxColumn
-    Friend WithEvents Fecha_registrada As DataGridViewTextBoxColumn
-    Friend WithEvents Column2 As DataGridViewTextBoxColumn
     Friend WithEvents Label6 As Label
     Friend WithEvents dateTime As DateTimePicker
     Friend WithEvents chkActivo As CheckBox
@@ -438,4 +456,14 @@ Partial Class frmReservas
     Friend WithEvents chkPendiente As CheckBox
     Friend WithEvents chkExpirada As CheckBox
     Friend WithEvents chkFinalizada As CheckBox
+    Friend WithEvents CodigoCliente As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn2 As DataGridViewTextBoxColumn
+    Friend WithEvents ReservasCodigo As DataGridViewTextBoxColumn
+    Friend WithEvents NombreCliente As DataGridViewTextBoxColumn
+    Friend WithEvents ReservasMesasCodigo As DataGridViewTextBoxColumn
+    Friend WithEvents ReservasEstado As DataGridViewTextBoxColumn
+    Friend WithEvents FechaReserva As DataGridViewTextBoxColumn
+    Friend WithEvents ReservasFechaHoraReserva As DataGridViewTextBoxColumn
+    Friend WithEvents ClienteCodigo As DataGridViewTextBoxColumn
+    Friend WithEvents CodigoMesa As DataGridViewTextBoxColumn
 End Class

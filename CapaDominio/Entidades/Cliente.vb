@@ -10,9 +10,13 @@ Public Class Cliente
     Public Property ClientesCorreo As String
     Public Property ClientesFechaRegistro As Date
     Public Property ClientesEstado As String
-    Public Property Reservas As List(Of MesaReserva)
 
+    Public Function EsActivo() As Boolean
+        Return ClientesEstado = "A"
+    End Function
 
-
+    Public Sub AsignarCodigo(codigo As String)
+        Me.ClientesCodigo = codigo
+    End Sub
 End Class
 

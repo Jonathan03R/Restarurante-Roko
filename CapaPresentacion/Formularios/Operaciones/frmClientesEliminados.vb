@@ -1,23 +1,19 @@
 ﻿Public Class frmClientesEliminados
-    Dim clienteNegocio As New ClienteNegocio()
+    Dim gestionClientesServicio As New procesoGestionClientesServicio()
 
     Private Sub frmClientesEliminados_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CargarClientesBorrados()
     End Sub
 
     Private Sub CargarClientesBorrados()
-        ' Obtener la lista de clientes borrados desde la capa de negocio
-        Dim listaClientesBorrados As List(Of Cliente) = clienteNegocio.ObtenerClientesBorrados()
 
-        ' Limpiar el ListView antes de llenarlo
+        Dim dataTableClientesBorrados As DataTable = gestionClientesServicio.MostrarClientesBorrados()
+
         lvClientes.Items.Clear()
 
-        ' Llenar el ListView con los clientes borrados
-        For Each cliente As Cliente In listaClientesBorrados
-            Dim item As New ListViewItem(cliente.ClientesCodigo)
-            item.SubItems.Add(cliente.ClientesNombreCompleto)
-            item.SubItems.Add(cliente.ClientesFechaRegistro.ToString("dd/MM/yyyy"))
-
+        For Each row As DataRow In dataTableClientesBorrados.Rows
+            Dim item As New ListViewItem(row("ClientesCodigo").ToString())
+            item.SubItems.Add(row("ClientesNombreCompleto").ToString())
             lvClientes.Items.Add(item)
         Next
     End Sub
@@ -32,7 +28,7 @@
             Dim resultado As DialogResult = MessageBox.Show("¿Está seguro de que desea recuperar este cliente?", "Confirmar Recuperación", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
 
             If resultado = DialogResult.Yes Then
-                If clienteNegocio.RecuperarCliente(clienteCodigo) Then
+                If gestionClientesServicio.recuperarCliente(clienteCodigo) Then
                     MessageBox.Show("Cliente recuperado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
                     CargarClientesBorrados()
                 Else

@@ -2,185 +2,190 @@
 
 Public Class ClienteSQL
 
+    ' Método para obtener todos los clientes activos
     Public Function ObtenerClientesActivos() As List(Of Cliente)
         Dim listaClientes As New List(Of Cliente)
+        Dim procedimientoSQL As String = "spListarClientesActivos"
 
-        Using cn As New SqlConnection(ModuloSistema.cCadenaConexion)
-            Dim cmd As New SqlCommand("spListarClientesActivos", cn)
-            cmd.CommandType = CommandType.StoredProcedure
-
-            cn.Open()
-            Dim dr As SqlDataReader = cmd.ExecuteReader()
-
-            While dr.Read()
-                Dim cliente As New Cliente()
-                cliente.ClientesCodigo = dr("ClientesCodigo").ToString()
-                cliente.ClientesNombre = dr("ClientesNombre").ToString()
-                cliente.ClientesApellidos = dr("ClientesApellidos").ToString()
-                cliente.ClientesTelefono = dr("ClientesTelefono").ToString()
-                cliente.ClientesDNI = dr("ClientesDNI").ToString()
-                cliente.ClientesCorreo = dr("ClientesCorreo").ToString()
-                cliente.ClientesFechaRegistro = Convert.ToDateTime(dr("ClientesFechaRegistro"))
-                cliente.ClientesEstado = dr("ClientesEstado").ToString()
-
-                ' Obtener reservas para el cliente actual
-                cliente.Reservas = ObtenerReservasPorCliente(cliente.ClientesCodigo)
-
-                listaClientes.Add(cliente)
-            End While
-            dr.Close()
-        End Using
+        Try
+            Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
+            Using dr As SqlDataReader = cmd.ExecuteReader()
+                While dr.Read()
+                    Dim cliente As New Cliente() With {
+                        .ClientesCodigo = dr("ClientesCodigo").ToString(),
+                        .ClientesNombre = dr("ClientesNombre").ToString(),
+                        .ClientesApellidos = dr("ClientesApellidos").ToString(),
+                        .ClientesTelefono = dr("ClientesTelefono").ToString(),
+                        .ClientesDNI = dr("ClientesDNI").ToString(),
+                        .ClientesCorreo = dr("ClientesCorreo").ToString(),
+                        .ClientesFechaRegistro = Convert.ToDateTime(dr("ClientesFechaRegistro")),
+                        .ClientesEstado = dr("ClientesEstado").ToString()
+                    }
+                    listaClientes.Add(cliente)
+                End While
+            End Using
+        Catch ex As Exception
+            Throw New Exception("Error al obtener clientes activos: " & ex.Message)
+        Finally
+            ' Cerrar la conexión
+            ModuloSistema.CerrarConexion()
+        End Try
 
         Return listaClientes
     End Function
 
+    ' Método para obtener reservas de un cliente específico
     Public Function ObtenerReservasPorCliente(clienteCodigo As String) As List(Of MesaReserva)
         Dim reservas As New List(Of MesaReserva)
+        Dim procedimientoSQL As String = "spListarReservasPorCliente"
 
-        Using cn As New SqlConnection(ModuloSistema.cCadenaConexion)
-            Dim cmd As New SqlCommand("spListarReservasPorCliente", cn)
-            cmd.CommandType = CommandType.StoredProcedure
+        Try
+            Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
             cmd.Parameters.AddWithValue("@ClientesCodigo", clienteCodigo)
-
-            cn.Open()
-            Dim dr As SqlDataReader = cmd.ExecuteReader()
-
-            ' Leer cada reserva y agregarla a la lista
-            While dr.Read()
-                Dim reserva As New MesaReserva()
-                reserva.ReservasCodigo = dr("ReservasCodigo").ToString()
-                reserva.ReservasMesasCodigo = dr("ReservasMesasCodigo").ToString()
-                reserva.ReservasEstado = dr("ReservasEstado").ToString()
-                reserva.ReservasFechaHoraReserva = Convert.ToDateTime(dr("ReservasFechaHoraReserva"))
-
-                reservas.Add(reserva)
-            End While
-            dr.Close()
-        End Using
+            Using dr As SqlDataReader = cmd.ExecuteReader()
+                While dr.Read()
+                    Dim reserva As New MesaReserva() With {
+                        .ReservasCodigo = dr("ReservasCodigo").ToString(),
+                        .ReservasMesasCodigo = dr("ReservasMesasCodigo").ToString(),
+                        .ReservasEstado = dr("ReservasEstado").ToString(),
+                        .ReservasFechaHoraReserva = Convert.ToDateTime(dr("ReservasFechaHoraReserva"))
+                    }
+                    reservas.Add(reserva)
+                End While
+            End Using
+        Catch ex As Exception
+            Throw New Exception("Error al obtener reservas del cliente: " & ex.Message)
+        End Try
 
         Return reservas
     End Function
-    Public Function ActualizarCliente(cliente As Cliente, consultaActualizacion As String) As Boolean
-        Using cn As New SqlConnection(ModuloSistema.cCadenaConexion)
-            Dim cmd As New SqlCommand(consultaActualizacion, cn)
 
-            ' Solo agregar los parámetros si se incluyen en la consulta
-            If consultaActualizacion.Contains("@ClientesNombre") Then
-                cmd.Parameters.AddWithValue("@ClientesNombre", cliente.ClientesNombre)
-            End If
-            If consultaActualizacion.Contains("@ClientesApellidos") Then
-                cmd.Parameters.AddWithValue("@ClientesApellidos", cliente.ClientesApellidos)
-            End If
-            If consultaActualizacion.Contains("@ClientesTelefono") Then
-                cmd.Parameters.AddWithValue("@ClientesTelefono", cliente.ClientesTelefono)
-            End If
-            If consultaActualizacion.Contains("@ClientesCorreo") Then
-                cmd.Parameters.AddWithValue("@ClientesCorreo", cliente.ClientesCorreo)
-            End If
+    ' Método para actualizar un cliente
+    Public Function ActualizarCliente(cliente As Cliente) As Boolean
+        Dim procedimientoSQL As String = "spActualizarCliente" ' Nombre del procedimiento almacenado
 
-            ' Agregar siempre el código del cliente
+        Try
+            Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
+
+            ' Agregar los parámetros necesarios al comando
             cmd.Parameters.AddWithValue("@ClientesCodigo", cliente.ClientesCodigo)
+            cmd.Parameters.AddWithValue("@ClientesNombre", cliente.ClientesNombre)
+            cmd.Parameters.AddWithValue("@ClientesApellidos", cliente.ClientesApellidos)
+            cmd.Parameters.AddWithValue("@ClientesTelefono", cliente.ClientesTelefono)
+            cmd.Parameters.AddWithValue("@ClientesCorreo", cliente.ClientesCorreo)
 
-            cn.Open()
+            ' Ejecutar el comando y devolver el resultado
             Dim filasAfectadas As Integer = cmd.ExecuteNonQuery()
-            cn.Close()
-
-            ' Verificar si se actualizó alguna fila
             Return filasAfectadas > 0
-        End Using
+        Catch ex As Exception
+            Throw New Exception("Error al actualizar cliente: " & ex.Message)
+        End Try
     End Function
 
+    ' Método para eliminar un cliente
     Public Function EliminarCliente(clienteCodigo As String) As Boolean
-        Using cn As New SqlConnection(ModuloSistema.cCadenaConexion)
-            Dim cmd As New SqlCommand("spEliminarCliente", cn)
-            cmd.CommandType = CommandType.StoredProcedure
+        Dim procedimientoSQL As String = "spEliminarCliente"
+
+        Try
+            Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
             cmd.Parameters.AddWithValue("@clienteCodigo", clienteCodigo)
-
-            cn.Open()
             Dim filasAfectadas As Integer = cmd.ExecuteNonQuery()
-            cn.Close()
-
-            ' Retorna true si se afectó alguna fila
             Return filasAfectadas > 0
-        End Using
+        Catch ex As Exception
+            Throw New Exception("Error al eliminar cliente: " & ex.Message)
+        End Try
     End Function
 
-
+    ' Método para obtener clientes borrados
     Public Function ObtenerClientesBorrados() As List(Of Cliente)
         Dim listaClientes As New List(Of Cliente)
+        Dim procedimientoSQL As String = "spListarClientesBorrados"
 
-        Using cn As New SqlConnection(ModuloSistema.cCadenaConexion)
-            Dim cmd As New SqlCommand("spListarClientesBorrados", cn)
-            cmd.CommandType = CommandType.StoredProcedure
-
-            cn.Open()
-            Dim dr As SqlDataReader = cmd.ExecuteReader()
-
-            While dr.Read()
-                Dim cliente As New Cliente()
-                cliente.ClientesCodigo = dr("ClientesCodigo").ToString()
-                cliente.ClientesNombreCompleto = dr("ClientesNombreCompleto").ToString()
-                cliente.ClientesFechaRegistro = Convert.ToDateTime(dr("ClientesFechaRegistro"))
-
-                listaClientes.Add(cliente)
-            End While
-            dr.Close()
-        End Using
+        Try
+            Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
+            Using dr As SqlDataReader = cmd.ExecuteReader()
+                While dr.Read()
+                    Dim cliente As New Cliente() With {
+                        .ClientesCodigo = dr("ClientesCodigo").ToString(),
+                        .ClientesNombreCompleto = dr("ClientesNombreCompleto").ToString(),
+                        .ClientesFechaRegistro = Convert.ToDateTime(dr("ClientesFechaRegistro"))
+                    }
+                    listaClientes.Add(cliente)
+                End While
+            End Using
+        Catch ex As Exception
+            Throw New Exception("Error al obtener clientes borrados: " & ex.Message)
+        End Try
 
         Return listaClientes
     End Function
 
-
+    ' Método para recuperar un cliente eliminado
     Public Function RecuperarCliente(clienteCodigo As String) As Boolean
-        Using cn As New SqlConnection(ModuloSistema.cCadenaConexion)
-            Dim cmd As New SqlCommand("spRecuperarClientes", cn)
-            cmd.CommandType = CommandType.StoredProcedure
+        Dim procedimientoSQL As String = "spRecuperarClientes"
+
+        Try
+            Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
             cmd.Parameters.AddWithValue("@clienteCodigo", clienteCodigo)
-
-            cn.Open()
             Dim filasAfectadas As Integer = cmd.ExecuteNonQuery()
-            cn.Close()
-
-            Return filasAfectadas > 0 ' Devolver true si se afectó alguna fila
-        End Using
+            Return filasAfectadas > 0
+        Catch ex As Exception
+            Throw New Exception("Error al recuperar cliente: " & ex.Message)
+        End Try
     End Function
 
-
+    ' Método para buscar clientes por nombre
     Public Function BuscarClientesPorNombre(nombre As String) As List(Of Cliente)
         Dim listaClientes As New List(Of Cliente)
+        Dim procedimientoSQL As String = "spBuscarClientesPorNombre"
 
-        Using cn As New SqlConnection(ModuloSistema.cCadenaConexion)
-            Dim cmd As New SqlCommand("spBuscarClientesPorNombre", cn)
-            cmd.CommandType = CommandType.StoredProcedure
+        Try
+            Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
             cmd.Parameters.AddWithValue("@nombre", nombre)
-
-            cn.Open()
-            Dim dr As SqlDataReader = cmd.ExecuteReader()
-
-            While dr.Read()
-                Dim cliente As New Cliente()
-                cliente.ClientesCodigo = dr("ClientesCodigo").ToString()
-                cliente.ClientesNombreCompleto = dr("ClientesNombreCompleto").ToString()
-                cliente.ClientesTelefono = dr("ClientesTelefono").ToString()
-                cliente.ClientesDNI = dr("ClientesDNI").ToString()
-                cliente.ClientesCorreo = dr("ClientesCorreo").ToString()
-                cliente.ClientesFechaRegistro = Convert.ToDateTime(dr("ClientesFechaRegistro"))
-                cliente.ClientesEstado = dr("ClientesEstado").ToString()
-
-                listaClientes.Add(cliente)
-            End While
-            dr.Close()
-        End Using
+            Using dr As SqlDataReader = cmd.ExecuteReader()
+                While dr.Read()
+                    Dim cliente As New Cliente() With {
+                        .ClientesCodigo = dr("ClientesCodigo").ToString(),
+                        .ClientesNombreCompleto = dr("ClientesNombreCompleto").ToString(),
+                        .ClientesTelefono = dr("ClientesTelefono").ToString(),
+                        .ClientesDNI = dr("ClientesDNI").ToString(),
+                        .ClientesCorreo = dr("ClientesCorreo").ToString(),
+                        .ClientesFechaRegistro = Convert.ToDateTime(dr("ClientesFechaRegistro")),
+                        .ClientesEstado = dr("ClientesEstado").ToString()
+                    }
+                    listaClientes.Add(cliente)
+                End While
+            End Using
+        Catch ex As Exception
+            Throw New Exception("Error al buscar clientes por nombre: " & ex.Message)
+        End Try
 
         Return listaClientes
     End Function
 
-    Public Function InsertarCliente(cliente As Cliente) As Boolean
-        Using cn As New SqlConnection(ModuloSistema.cCadenaConexion)
-            Dim cmd As New SqlCommand("spInsertarCliente", cn)
-            cmd.CommandType = CommandType.StoredProcedure
+    Public Function BuscarClientesPorNombreComoDataTable(nombre As String) As DataTable
+        Dim dataTable As New DataTable()
+        Dim procedimientoSQL As String = "spBuscarClientesPorNombre"
 
-            ' Agregamos los parámetros
+        Try
+            Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
+            cmd.Parameters.AddWithValue("@nombre", nombre)
+
+            Dim adapter As New SqlDataAdapter(cmd)
+            adapter.Fill(dataTable)
+        Catch ex As Exception
+            Throw New Exception("Error al buscar clientes: " & ex.Message)
+        End Try
+
+        Return dataTable
+    End Function
+
+    ' Método para insertar un nuevo cliente
+    Public Function InsertarCliente(cliente As Cliente) As Boolean
+        Dim procedimientoSQL As String = "spInsertarCliente"
+
+        Try
+            Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
             cmd.Parameters.AddWithValue("@ClientesCodigo", cliente.ClientesCodigo)
             cmd.Parameters.AddWithValue("@ClientesNombre", cliente.ClientesNombre)
             cmd.Parameters.AddWithValue("@ClientesApellidos", cliente.ClientesApellidos)
@@ -188,18 +193,11 @@ Public Class ClienteSQL
             cmd.Parameters.AddWithValue("@ClientesDNI", cliente.ClientesDNI)
             cmd.Parameters.AddWithValue("@ClientesCorreo", cliente.ClientesCorreo)
 
-            cn.Open()
-
-            Try
-                ' Ejecutamos el comando
-                Dim filasAfectadas As Integer = cmd.ExecuteNonQuery()
-                Return filasAfectadas > 0
-            Catch ex As SqlException
-                Throw New Exception("Error al insertar cliente: " & ex.Message)
-            Finally
-                cn.Close()
-            End Try
-        End Using
+            Dim filasAfectadas As Integer = cmd.ExecuteNonQuery()
+            Return filasAfectadas > 0
+        Catch ex As SqlException
+            Throw New Exception("Error al insertar cliente: " & ex.Message)
+        End Try
     End Function
 
 End Class

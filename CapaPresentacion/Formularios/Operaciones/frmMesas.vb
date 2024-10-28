@@ -1,21 +1,20 @@
 ﻿Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 
 Public Class frmMesas
-    Dim mesaNegocio As New MesaNegocio()
-    Private listaMesas As List(Of Mesa)
+    Private gestionarMesasServicio As New ProcesoGestionarMesasServicio()
+
     Private Sub cargarMesas()
-        listaMesas = mesaNegocio.ObtenerMesas()
-        tablaMesas.Rows.Clear()
+        Try
+            Dim dataTableMesas As DataTable = gestionarMesasServicio.CrearUnaNuevaMesa()
+            tablaMesas.Rows.Clear()
 
+            For Each row As DataRow In dataTableMesas.Rows
+                tablaMesas.Rows.Add(row("MesasCodigo"), row("MesasCapacidad"), row("MesasEstado"))
+            Next
 
-        For Each mesas As Mesa In listaMesas
-            Dim row As String() = {
-                mesas.MesasCodigo,
-                mesas.MesasCapacidad,
-                mesas.MesasEstado
-            }
-            tablaMesas.Rows.Add(row)
-        Next
+        Catch ex As Exception
+            MessageBox.Show("Error al cargar mesas: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
 
     Private Sub frmMesas_Load(sender As Object, e As EventArgs) Handles MyBase.Load

@@ -1,6 +1,6 @@
 ﻿Public Class frmClientes
-    Dim clienteNegocio As New ClienteNegocio()
-    Dim listaClientes As List(Of Cliente)
+
+    Private gestionasClientesServicios As New procesoGestionClientesServicio()
 
     Private Sub frmClientes_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CargarClientes()
@@ -11,29 +11,10 @@
     End Sub
 
     Private Sub CargarClientes()
-        listaClientes = clienteNegocio.ObtenerClientesActivos()
-        LlenarGridClientes()
-    End Sub
 
-    Private Sub LlenarGridClientes()
-        tabla.Rows.Clear()
-
-        For Each cliente As Cliente In listaClientes
-            Dim numeroDeReservas As Integer = If(cliente.Reservas IsNot Nothing, cliente.Reservas.Count, 0)
-
-            Dim row As String() = New String() {
-                cliente.ClientesCodigo,
-                numeroDeReservas.ToString(), ' Número de reservas
-                cliente.ClientesNombre,
-                cliente.ClientesApellidos,
-                cliente.ClientesTelefono,
-                cliente.ClientesDNI,
-                cliente.ClientesCorreo,
-                cliente.ClientesFechaRegistro.ToString("dd/MM/yyyy")
-            }
-
-            tabla.Rows.Add(row)
-        Next
+        tabla.AutoGenerateColumns = False
+        Dim clientesActivos As DataTable = gestionasClientesServicios.ObtenerClientesActivosComoDataTable()
+        tabla.DataSource = clientesActivos
     End Sub
 
     ' Evento cuando seleccionas una fila del DataGridView de clientes
@@ -42,20 +23,20 @@
             Dim filaSeleccionada As DataGridViewRow = tabla.Rows(e.RowIndex)
 
             ' Llenar los campos de texto con los datos del cliente
-            txtcodigo.Text = filaSeleccionada.Cells(0).Value.ToString()
-            txtnombres.Text = filaSeleccionada.Cells(2).Value.ToString()
-            txtapellidos.Text = filaSeleccionada.Cells(3).Value.ToString()
-            txttelefono.Text = filaSeleccionada.Cells(4).Value.ToString()
-            txtdni.Text = filaSeleccionada.Cells(5).Value.ToString()
-            txtcorreo.Text = filaSeleccionada.Cells(6).Value.ToString()
+            txtcodigo.Text = filaSeleccionada.Cells("ClientesCodigo").Value.ToString()
+            txtnombres.Text = filaSeleccionada.Cells("ClientesNombre").Value.ToString()
+            txtapellidos.Text = filaSeleccionada.Cells("ClientesApellidos").Value.ToString()
+            txttelefono.Text = filaSeleccionada.Cells("ClientesTelefono").Value.ToString()
+            txtdni.Text = filaSeleccionada.Cells("ClientesDNI").Value.ToString()
+            txtcorreo.Text = filaSeleccionada.Cells("ClientesCorreo").Value.ToString()
 
-            Dim fechaRegistro As Date = Convert.ToDateTime(filaSeleccionada.Cells(7).Value)
-            datefecha.Value = fechaRegistro
+            datefecha.Value = Convert.ToDateTime(filaSeleccionada.Cells("ClientesFechaRegistro").Value)
 
-            Dim clienteCodigo As String = filaSeleccionada.Cells(0).Value.ToString()
-            Dim reservas As List(Of MesaReserva) = clienteNegocio.ObtenerReservasPorCliente(clienteCodigo)
+            Dim clienteCodigo As String = filaSeleccionada.Cells("ClientesCodigo").Value.ToString()
 
-            LlenarGridReservas(reservas)
+            llenarReservas(clienteCodigo)
+
+            'LlenarGridReservas(reservas)
             txtdni.Enabled = False
             btnGuardar.Enabled = False
             btnActualizar.Enabled = True
@@ -65,35 +46,28 @@
     End Sub
 
     ' Método para llenar el DataGridView de Reservas
-    Private Sub LlenarGridReservas(reservas As List(Of MesaReserva))
-        tablaReservas.Rows.Clear()
+    Private Sub llenarReservas(clienteCodigo As String)
+        tablaReservas.AutoGenerateColumns = False
+        Dim reservasDeClientes As DataTable = gestionasClientesServicios.obtenerReservasPorClientes(clienteCodigo)
 
-        For Each reserva As MesaReserva In reservas
-            Dim row As String() = New String() {
-                reserva.ReservasCodigo,
-                reserva.ReservasFechaHoraReserva.ToString("dd/MM/yyyy"),
-                reserva.ReservasEstado,
-                reserva.ReservasMesasCodigo
-            }
-
-            tablaReservas.Rows.Add(row)
-        Next
+        tablaReservas.DataSource = reservasDeClientes
     End Sub
 
     Private Sub btnActualizar_Click(sender As Object, e As EventArgs) Handles btnActualizar.Click
-        Dim clienteActualizado As New Cliente With {
-            .ClientesCodigo = txtcodigo.Text,
-            .ClientesNombre = txtnombres.Text,
-            .ClientesApellidos = txtapellidos.Text,
-            .ClientesTelefono = txttelefono.Text,
-            .ClientesCorreo = txtcorreo.Text
-        }
-
         Try
-            ' Llamamos a la capa de negocio para actualizar el cliente
-            If clienteNegocio.ActualizarCliente(clienteActualizado) Then
+            ' Obtenemos los valores desde los TextBox
+            Dim clienteCodigo As String = txtcodigo.Text
+            Dim nombre As String = txtnombres.Text
+            Dim apellidos As String = txtapellidos.Text
+            Dim telefono As String = txttelefono.Text
+            Dim correo As String = txtcorreo.Text
+
+            ' Llamamos a la capa de aplicación para actualizar el cliente
+            Dim resultado As Boolean = gestionasClientesServicios.ActualizarCliente(clienteCodigo, nombre, apellidos, telefono, correo)
+
+            If resultado Then
                 MessageBox.Show("Cliente actualizado correctamente.", "Actualización", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                CargarClientes()
+                CargarClientes() ' Refrescamos la lista de clientes después de la actualización
             Else
                 MessageBox.Show("No se pudo actualizar el cliente.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End If
@@ -104,19 +78,16 @@
 
     Private Sub btndelete_Click(sender As Object, e As EventArgs) Handles btndelete.Click
         If tabla.SelectedRows.Count > 0 Then
-            Dim clienteCodigo As String = tabla.SelectedRows(0).Cells(0).Value.ToString()
-
-            Dim clienteAEliminar As New Cliente With {
-                .ClientesCodigo = clienteCodigo
-            }
+            Dim clienteCodigo As String = tabla.SelectedRows(0).Cells("ClientesCodigo").Value.ToString()
 
             Dim confirmacion As DialogResult = MessageBox.Show("¿Estás seguro de eliminar este cliente?", "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Warning)
 
             If confirmacion = DialogResult.Yes Then
                 Try
-                    If clienteNegocio.EliminarCliente(clienteAEliminar) Then
-                        MessageBox.Show("Cliente eliminado correctamente.", "Eliminación", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                        CargarClientes()
+                    ' Llamada a la capa de negocio para eliminar el cliente
+                    If gestionasClientesServicios.CambiarEstadoClienteAInactivo(clienteCodigo) Then
+                        MessageBox.Show("Cliente: " + clienteCodigo + " a sido eliminado correctamente.", "Eliminación", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        CargarClientes() ' Recargar la lista de clientes para reflejar los cambios
                     Else
                         MessageBox.Show("No se pudo eliminar el cliente.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                     End If
@@ -144,7 +115,7 @@
             datefecha.Value = DateTime.Now
             btnGuardar.Enabled = True
             limpiarCampos()
-            Dim nuevoCodigo As String = clienteNegocio.GenerarCodigoUnicoCliente()
+            Dim nuevoCodigo As String = gestionasClientesServicios.GenerarCodigoUnicoCliente()
             txtcodigo.Text = nuevoCodigo
         Catch ex As Exception
             MessageBox.Show("Error al generar el código del empleado: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -163,20 +134,19 @@
 
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         Try
-            Dim nuevoCliente As New Cliente With {
-                .ClientesCodigo = txtcodigo.Text,
-                .ClientesNombre = txtnombres.Text,
-                .ClientesApellidos = txtapellidos.Text,
-                .ClientesTelefono = txttelefono.Text,
-                .ClientesDNI = txtdni.Text,
-                .ClientesCorreo = txtcorreo.Text
-            }
+            Dim resultado As Boolean = gestionasClientesServicios.AgregarNuevoCliente(
+            ClienteNombre:=txtnombres.Text,
+            ClienteApellido:=txtapellidos.Text,
+            ClienteTelefono:=txttelefono.Text,
+            ClienteDni:=txtdni.Text,
+            ClienteCorreo:=txtcorreo.Text
+        )
 
-            If clienteNegocio.InsertarCliente(nuevoCliente) Then
+
+            If resultado Then
                 MessageBox.Show("Cliente insertado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 limpiarCampos()
-                LlenarGridClientes()
-                CargarClientes()
+                CargarClientes() 'Actualizar el DataGridView con los nuevos datos
             Else
                 MessageBox.Show("No se pudo insertar el cliente.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End If

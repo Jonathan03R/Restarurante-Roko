@@ -1,4 +1,6 @@
 ﻿Public Class frmGestionarPedido
+
+    Private procesarPedidosServicio As New ProcesarPedidoServicio()
     Public Property MesaCodigo As String
     Private pedidoCodigo As String
     Private pedidoFecha As Date
@@ -6,16 +8,14 @@
     Private Sub frmGestionarPedido_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CargarMenuActivo()
         CargarPedidoYDetalles()
+        CargarDetallesPedido(MesaCodigo)
     End Sub
     Private Sub CargarMenuActivo()
-        Dim menuNegocio As New MenuNegocio()
-        Dim listaMenu = menuNegocio.ObtenerMenuActivo()
-
-        cmbMenu.Items.Clear()
-        For Each item As Menu In listaMenu
-            cmbMenu.Items.Add(item)
-        Next
+        Dim listaMenu As List(Of Menu) = procesarPedidosServicio.ListarMenuActivo()
         cmbMenu.DisplayMember = "MenuNombre"
+        cmbMenu.ValueMember = "MenuCodigo"
+        cmbMenu.DataSource = listaMenu
+
     End Sub
     Private Sub cmbMenu_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbMenu.SelectedIndexChanged
         Dim menuSeleccionado As Menu = CType(cmbMenu.SelectedItem, Menu)
@@ -27,8 +27,7 @@
     End Sub
 
     Private Sub CargarPedidoYDetalles()
-        Dim pedidoNegocio As New PedidoNegocio()
-        Dim pedido As Pedido = pedidoNegocio.ObtenerPedidoPorMesa(MesaCodigo)
+        Dim pedido As Pedido = procesarPedidosServicio.ObtenerPedidoPorMesa(MesaCodigo)
 
         If pedido IsNot Nothing Then
             pedidoCodigo = pedido.PedidosCodigo
@@ -37,30 +36,33 @@
             lblPedidoCodigo.Text = pedido.PedidosCodigo
             lblMesaCodigo.Text = pedido.PedidosMesasCodigo
             lblEmpleadoCodigo.Text = pedido.PedidosEmpleadosCodigo
-            lblFechaPedido.text = pedido.PedidoFecha
+            lblFechaPedido.Text = pedido.PedidoFecha
             lblFecha.Text = pedido.PedidoFecha.ToString()
-            CargarDetallesPedido(pedido.PedidosCodigo)
         Else
             MessageBox.Show("No se encontró un pedido activo para esta mesa.")
+            procesarPedidosServicio.cancelarElPedido(MesaCodigo)
             Me.Close()
         End If
     End Sub
 
-    Private Sub CargarDetallesPedido(pedidoCodigo As String)
-        Dim detalleNegocio As New DetallePedidoNegocio()
-        Dim listaDetalles As List(Of DetallePedido) = detalleNegocio.ObtenerDetallesPedido(pedidoCodigo)
+    Private Sub CargarDetallesPedido(mesaCodigo As String)
+        Try
+            Dim detallesDataTable As DataTable = procesarPedidosServicio.ObtenerDetallesPedidoComoDataTable(mesaCodigo)
 
-        lvDetallesPedido.Items.Clear() ' Limpiar el ListView antes de cargar
+            lvDetallesPedido.Items.Clear()
 
-        For Each detalle In listaDetalles
-            Dim item As New ListViewItem(detalle.Menu.MenuNombre)
-            item.SubItems.Add(detalle.DetallesPedidoCantidad.ToString())
-            item.SubItems.Add(detalle.DetallesPedidoPrecio.ToString("C"))
-            item.SubItems.Add((detalle.DetallesPedidoCantidad * detalle.DetallesPedidoPrecio).ToString("C"))
+            For Each row As DataRow In detallesDataTable.Rows
+                Dim item As New ListViewItem(row("MenuNombre").ToString())
+                item.SubItems.Add(row("DetallesPedidoCantidad").ToString())
+                item.SubItems.Add(Convert.ToDouble(row("DetallesPedidoPrecio")).ToString("C"))
+                item.SubItems.Add(Convert.ToDouble(row("Total")).ToString("C"))
+                item.Tag = row("DetallesPedidoCodigo").ToString()
+                lvDetallesPedido.Items.Add(item)
+            Next
 
-            ' Agregar el item al ListView
-            lvDetallesPedido.Items.Add(item)
-        Next
+        Catch ex As Exception
+            MessageBox.Show("Error al cargar detalles del pedido: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
 
     Private Sub btnAgregarDetalle_Click(sender As Object, e As EventArgs) Handles btnAgregarDetalle.Click
@@ -81,28 +83,12 @@
             Exit Sub
         End If
         Dim menuSeleccionado As Menu = CType(cmbMenu.SelectedItem, Menu)
-        Dim codigoSQL As New CodigosSQL()
-        Dim detalleCodigo As String = codigoSQL.GenerarCodigoUnico("DET", "Restaurante.DetallesPedido", "DetallesPedidoCodigo")
-        Dim nuevoDetalle As New DetallePedido With {
-        .DetallesPedidoMenuCodigo = menuSeleccionado.MenuCodigo,
-        .DetallesPedidoPrecio = precio,
-        .DetallesPedidoCantidad = cantidad,
-        .Menu = menuSeleccionado
-    }
-        Dim detalleNegocio As New DetallePedidoNegocio()
-        detalleNegocio.AgregarDetallePedido(pedidoCodigo, nuevoDetalle)
-        ActualizarDetallesPedidoListView(nuevoDetalle)
+
+        procesarPedidosServicio.agregarDetallePedidos(menuSeleccionado.MenuCodigo, precio, cantidad, MesaCodigo)
+        CargarDetallesPedido(MesaCodigo)
         LimpiarControles()
     End Sub
-    Private Sub ActualizarDetallesPedidoListView(detalle As DetallePedido)
-        Dim item As New ListViewItem(detalle.Menu.MenuNombre)
-        item.SubItems.Add(detalle.DetallesPedidoCantidad.ToString()) ' Cantidad
-        item.SubItems.Add(detalle.DetallesPedidoPrecio.ToString("C")) ' Precio en formato moneda
-        item.SubItems.Add((detalle.DetallesPedidoCantidad * detalle.DetallesPedidoPrecio).ToString("C")) ' Total en formato moneda
 
-        ' Agregar el ítem al ListView
-        lvDetallesPedido.Items.Add(item)
-    End Sub
 
     Private Sub LimpiarControles()
         cmbMenu.SelectedIndex = -1
@@ -112,14 +98,12 @@
 
     Private Sub btnEliminarDetalle_Click(sender As Object, e As EventArgs) Handles btnEliminarDetalle.Click
         If lvDetallesPedido.SelectedItems.Count > 0 Then
-            Dim detalleCodigo As String = lvDetallesPedido.SelectedItems(0).Text
+            Dim detalleCodigo As String = lvDetallesPedido.SelectedItems(0).Tag.ToString()
             Dim result As DialogResult = MessageBox.Show("¿Está seguro de que desea eliminar este detalle?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Warning)
 
             If result = DialogResult.Yes Then
-                Dim detalleNegocio As New DetallePedidoNegocio()
-                detalleNegocio.EliminarDetallePedido(detalleCodigo)
-                lvDetallesPedido.Items.Remove(lvDetallesPedido.SelectedItems(0))
-
+                procesarPedidosServicio.EliminarDetallePedido(detalleCodigo)
+                CargarDetallesPedido(MesaCodigo)
                 MessageBox.Show("Detalle de pedido eliminado con éxito.", "Eliminado")
             End If
         Else
@@ -128,19 +112,20 @@
     End Sub
 
     Private Sub btnFinalizarPedido_Click(sender As Object, e As EventArgs) Handles btnFinalizarPedido.Click
-        Dim detalleNegocio As New DetallePedidoNegocio()
-        Dim listaDetalles As List(Of DetallePedido) = detalleNegocio.ObtenerDetallesPedido(pedidoCodigo)
+        Dim detallesDataTable As DataTable = procesarPedidosServicio.ObtenerDetallesPedidoComoDataTable(MesaCodigo)
 
         Dim montoTotal As Decimal = 0
 
-        For Each detalle In listaDetalles
-            montoTotal += Convert.ToDecimal(detalle.DetallesPedidoCantidad * detalle.DetallesPedidoPrecio)
+        For Each row As DataRow In detallesDataTable.Rows
+            montoTotal += Convert.ToDecimal(row("Total"))
         Next
-        Dim frmPago As New frmPagos()
-        frmPago.PedidoCodigo = pedidoCodigo
-        frmPago.MesaCodigo = MesaCodigo
-        frmPago.PedidoFecha = pedidoFecha
-        frmPago.MontoTotal = montoTotal
+
+        Dim frmPago As New frmPagos() With {
+            .PedidoCodigo = pedidoCodigo,
+            .MesaCodigo = MesaCodigo,
+            .MontoTotal = montoTotal
+        }
+
         frmPago.ShowDialog()
         Me.Close()
     End Sub

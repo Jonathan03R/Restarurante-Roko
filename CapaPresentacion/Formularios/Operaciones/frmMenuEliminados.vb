@@ -2,7 +2,8 @@
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 
 Public Class frmMenuEliminados
-    Private menuNegocio As New MenuNegocio()
+    'Private menuNegocio As New MenuNegocio()
+    Private procesoGestionarMenu As New ProcesoGestionarMenuServicio()
 
     Private Sub frmMenuEliminado_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         lvMenu.View = View.Details
@@ -17,22 +18,22 @@ Public Class frmMenuEliminados
 
     Private Sub CargarListaMenuEliminado()
         Try
-            Dim listaMenu As List(Of Menu) = menuNegocio.ObtenerMenu()
+            Dim dataTable As DataTable = procesoGestionarMenu.MostrarMenu()
 
             lvMenu.Items.Clear()
 
-            For Each menuItem As Menu In listaMenu
-                If menuItem.MenuEstado = "E" Then ' Filtrar solo los menús eliminados
-                    Dim item As New ListViewItem(menuItem.MenuCodigo.Trim())
-                    item.SubItems.Add(menuItem.MenuNombre)
-                    item.SubItems.Add(menuItem.MenuDescripcion)
-                    item.SubItems.Add(menuItem.MenuPrecio.ToString("F2")) ' Formato de precio
+            For Each row As DataRow In dataTable.Rows
+                If row("MenuEstado").ToString() = "E" Then
+                    Dim item As New ListViewItem(row("MenuCodigo").ToString().Trim())
+                    item.SubItems.Add(row("MenuNombre").ToString())
+                    item.SubItems.Add(row("MenuDescripcion").ToString())
+                    item.SubItems.Add(Convert.ToDouble(row("MenuPrecio")).ToString("F2")) ' Formato de precio
                     item.SubItems.Add("Eliminado")
 
+                    ' Agregar el elemento al ListView
                     lvMenu.Items.Add(item)
                 End If
             Next
-
         Catch ex As Exception
             MessageBox.Show("Error al cargar la lista de menús eliminados: " & ex.Message)
         End Try
@@ -45,19 +46,12 @@ Public Class frmMenuEliminados
                 Return
             End If
             Dim menuCodigo As String = lvMenu.SelectedItems(0).SubItems(0).Text.Trim()
-            Dim menuSeleccionado As Menu = menuNegocio.ObtenerMenuPorCodigo(menuCodigo)
-            If menuSeleccionado IsNot Nothing Then
-                menuSeleccionado.MenuEstado = "A"
-                If menuNegocio.ActualizarMenu(menuSeleccionado) Then
-                    MessageBox.Show("El menú ha sido recuperado correctamente y ahora está activo.")
-                    CargarListaMenuEliminado()
-                Else
-                    MessageBox.Show("No se pudo recuperar el menú.")
-                End If
-            Else
-                MessageBox.Show("No se encontró el menú seleccionado.")
+            Dim result As Boolean = procesoGestionarMenu.ELiminarMenu(menuCodigo)
+            If result Then
+                MessageBox.Show("El menú ha sido recuperado correctamente y ahora está activo.")
             End If
 
+            CargarListaMenuEliminado()
         Catch ex As Exception
             MessageBox.Show("Error al recuperar el menú: " & ex.Message)
         End Try

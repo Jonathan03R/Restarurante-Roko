@@ -8,4 +8,19 @@
 
     Public Property Pedido As Pedido
     Public Property Menu As Menu
+
+
+    Public Function CalcularTotal() As Double
+        Return DetallesPedidoCantidad * DetallesPedidoPrecio
+    End Function
+
+    'Public Function MenuDisponible() As Boolean
+    '    Return Menu IsNot Nothing AndAlso Menu.MenuEstado = "A"
+    'End Function
+
+
+    Public Sub MarcarComoCancelado()
+        DetallesPedidoEstado = "X" ' X para Cancelado
+    End Sub
+
 End Class

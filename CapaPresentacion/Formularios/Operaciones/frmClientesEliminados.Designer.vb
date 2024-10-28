@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class frmClientesEliminados
     Inherits System.Windows.Forms.Form
 
     'Form reemplaza a Dispose para limpiar la lista de componentes.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class frmClientesEliminados
     'NOTA: el Diseñador de Windows Forms necesita el siguiente procedimiento
     'Se puede modificar usando el Diseñador de Windows Forms.  
     'No lo modifique con el editor de código.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.cmdCerrar = New System.Windows.Forms.Button()
@@ -29,7 +29,6 @@ Partial Class frmClientesEliminados
         Me.lvClientes = New System.Windows.Forms.ListView()
         Me.ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ColumnHeader2 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me.ColumnHeader3 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.SuspendLayout()
         '
         'Label1
@@ -40,7 +39,7 @@ Partial Class frmClientesEliminados
         Me.Label1.Location = New System.Drawing.Point(0, 0)
         Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(934, 51)
+        Me.Label1.Size = New System.Drawing.Size(684, 51)
         Me.Label1.TabIndex = 2
         Me.Label1.Text = "Clientes eliminados"
         Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
@@ -49,7 +48,7 @@ Partial Class frmClientesEliminados
         '
         Me.cmdCerrar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdCerrar.ImageKey = "IconoAgregar.gif"
-        Me.cmdCerrar.Location = New System.Drawing.Point(741, 286)
+        Me.cmdCerrar.Location = New System.Drawing.Point(541, 282)
         Me.cmdCerrar.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.cmdCerrar.Name = "cmdCerrar"
         Me.cmdCerrar.Size = New System.Drawing.Size(119, 38)
@@ -62,7 +61,7 @@ Partial Class frmClientesEliminados
         '
         Me.cmdRecuperar.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdRecuperar.ImageKey = "House_48x48-32.gif"
-        Me.cmdRecuperar.Location = New System.Drawing.Point(616, 286)
+        Me.cmdRecuperar.Location = New System.Drawing.Point(416, 282)
         Me.cmdRecuperar.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.cmdRecuperar.Name = "cmdRecuperar"
         Me.cmdRecuperar.Size = New System.Drawing.Size(119, 38)
@@ -76,7 +75,7 @@ Partial Class frmClientesEliminados
         Me.Label7.AutoSize = True
         Me.Label7.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label7.ForeColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(192, Byte), Integer))
-        Me.Label7.Location = New System.Drawing.Point(25, 72)
+        Me.Label7.Location = New System.Drawing.Point(40, 66)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(155, 20)
         Me.Label7.TabIndex = 19
@@ -87,14 +86,14 @@ Partial Class frmClientesEliminados
         Me.lvClientes.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lvClientes.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1, Me.ColumnHeader2, Me.ColumnHeader3})
+        Me.lvClientes.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1, Me.ColumnHeader2})
         Me.lvClientes.FullRowSelect = True
         Me.lvClientes.GridLines = True
         Me.lvClientes.HideSelection = False
-        Me.lvClientes.Location = New System.Drawing.Point(21, 103)
+        Me.lvClientes.Location = New System.Drawing.Point(36, 97)
         Me.lvClientes.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.lvClientes.Name = "lvClientes"
-        Me.lvClientes.Size = New System.Drawing.Size(865, 169)
+        Me.lvClientes.Size = New System.Drawing.Size(624, 169)
         Me.lvClientes.TabIndex = 18
         Me.lvClientes.UseCompatibleStateImageBehavior = False
         Me.lvClientes.View = System.Windows.Forms.View.Details
@@ -107,18 +106,13 @@ Partial Class frmClientesEliminados
         'ColumnHeader2
         '
         Me.ColumnHeader2.Text = "Apellidos y nombres"
-        Me.ColumnHeader2.Width = 417
-        '
-        'ColumnHeader3
-        '
-        Me.ColumnHeader3.Text = "Fecha Nacimiento"
-        Me.ColumnHeader3.Width = 223
+        Me.ColumnHeader2.Width = 500
         '
         'frmClientesEliminados
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(934, 353)
+        Me.ClientSize = New System.Drawing.Size(684, 353)
         Me.Controls.Add(Me.cmdCerrar)
         Me.Controls.Add(Me.cmdRecuperar)
         Me.Controls.Add(Me.Label7)
@@ -138,5 +132,4 @@ Partial Class frmClientesEliminados
     Friend WithEvents lvClientes As ListView
     Friend WithEvents ColumnHeader1 As ColumnHeader
     Friend WithEvents ColumnHeader2 As ColumnHeader
-    Friend WithEvents ColumnHeader3 As ColumnHeader
 End Class

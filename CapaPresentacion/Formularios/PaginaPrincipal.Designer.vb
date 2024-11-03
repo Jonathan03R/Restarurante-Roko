@@ -37,8 +37,6 @@ Partial Class PaginaPrincipal
         Me.mnuSalir = New System.Windows.Forms.ToolStripMenuItem()
         Me.FinanzasToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuPagos = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuFacturas = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuBoleta = New System.Windows.Forms.ToolStripMenuItem()
         Me.SoporteYAyudaToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem6 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItem7 = New System.Windows.Forms.ToolStripSeparator()
@@ -140,7 +138,7 @@ Partial Class PaginaPrincipal
         '
         'FinanzasToolStripMenuItem
         '
-        Me.FinanzasToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuPagos, Me.mnuFacturas, Me.mnuBoleta})
+        Me.FinanzasToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuPagos})
         Me.FinanzasToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.FinanzasToolStripMenuItem.Name = "FinanzasToolStripMenuItem"
         Me.FinanzasToolStripMenuItem.Size = New System.Drawing.Size(237, 36)
@@ -150,22 +148,8 @@ Partial Class PaginaPrincipal
         '
         Me.mnuPagos.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.mnuPagos.Name = "mnuPagos"
-        Me.mnuPagos.Size = New System.Drawing.Size(202, 36)
+        Me.mnuPagos.Size = New System.Drawing.Size(180, 36)
         Me.mnuPagos.Text = "Pagos"
-        '
-        'mnuFacturas
-        '
-        Me.mnuFacturas.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
-        Me.mnuFacturas.Name = "mnuFacturas"
-        Me.mnuFacturas.Size = New System.Drawing.Size(202, 36)
-        Me.mnuFacturas.Text = "Facturas"
-        '
-        'mnuBoleta
-        '
-        Me.mnuBoleta.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
-        Me.mnuBoleta.Name = "mnuBoleta"
-        Me.mnuBoleta.Size = New System.Drawing.Size(202, 36)
-        Me.mnuBoleta.Text = "Boleta"
         '
         'SoporteYAyudaToolStripMenuItem
         '
@@ -250,8 +234,6 @@ Partial Class PaginaPrincipal
     Friend WithEvents mnuSalir As ToolStripMenuItem
     Friend WithEvents FinanzasToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents mnuPagos As ToolStripMenuItem
-    Friend WithEvents mnuFacturas As ToolStripMenuItem
-    Friend WithEvents mnuBoleta As ToolStripMenuItem
     Friend WithEvents SoporteYAyudaToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem6 As ToolStripSeparator
     Friend WithEvents ToolStripMenuItem7 As ToolStripSeparator

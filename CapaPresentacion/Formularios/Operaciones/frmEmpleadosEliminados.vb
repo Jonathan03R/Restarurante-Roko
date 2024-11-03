@@ -1,24 +1,26 @@
 ﻿Public Class frmEmpleadosEliminados
-    Dim empleadosNegocio As New EmpleadosNegocio()
-    Dim listaEmpleadosBorrados As List(Of Empleado)
+    'Dim empleadosNegocio As New EmpleadosNegocio()
+    'Dim listaEmpleadosBorrados As List(Of Empleado)
 
+    Dim procesoGestionarEmpleado As New ProcesoGestionarEmpleadosServicios()
     Private Sub frmEmpleadosEliminados_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CargarEmpleadosEliminados()
     End Sub
 
     Private Sub CargarEmpleadosEliminados()
-        listaEmpleadosBorrados = empleadosNegocio.ObtenerEmpleadosBorrados()
+
+        Dim dataTableEmpleadoEliminado As DataTable = procesoGestionarEmpleado.obtenerEmpleadoInactivo()
 
         lvEmpleados.Items.Clear()
 
-        For Each empleado As Empleado In listaEmpleadosBorrados
-            Dim item As New ListViewItem(empleado.EmpleadosCodigo)
-            item.SubItems.Add(empleado.EmpleadosNombreCompleto)
-            item.SubItems.Add(empleado.EmpleadosFechaContratacion.ToString("dd/MM/yyyy"))
-            item.SubItems.Add(empleado.RolPermiso.RolesPermisosNombreRol)
-
+        For Each row As DataRow In dataTableEmpleadoEliminado.Rows
+            Dim item As New ListViewItem(row("EmpleadosCodigo").ToString())
+            item.SubItems.Add(row("EmpleadosNombreCompleto").ToString())
+            item.SubItems.Add(row("EmpleadosFechaContratacion").ToString())
+            item.SubItems.Add(row("RolesPermisosNombreRol").ToString())
             lvEmpleados.Items.Add(item)
         Next
+
     End Sub
 
     Private Sub lvEmpleados_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lvEmpleados.SelectedIndexChanged
@@ -34,7 +36,7 @@
             Dim resultado As DialogResult = MessageBox.Show("¿Está seguro de que desea recuperar este cliente?", "Confirmar Recuperación", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
 
             If resultado = DialogResult.Yes Then
-                If empleadosNegocio.RecuperarEmpleado(empleadosCodigo) Then
+                If procesoGestionarEmpleado.recuperarEmpleado(empleadosCodigo) Then
                     MessageBox.Show("Cliente recuperado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
                     CargarEmpleadosEliminados()
                 Else
@@ -53,4 +55,6 @@
     Private Sub Label7_Click(sender As Object, e As EventArgs) Handles Label7.Click
 
     End Sub
+
+
 End Class

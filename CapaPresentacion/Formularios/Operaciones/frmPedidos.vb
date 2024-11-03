@@ -1,35 +1,35 @@
 ﻿Public Class frmPedidos
     ' Variables y objetos necesarios
-    Private detalleNegocio As New DetallePedidoNegocio()
-    Private pedidoNegocio As New PedidoNegocio()
-    Private mesaNegocio As New MesaNegocio()
-    Private menuNegocio As New MenuNegocio()
+    'Private detalleNegocio As New DetallePedidoNegocio()
+    'Private pedidoNegocio As New PedidoNegocio()
+    'Private mesaNegocio As New MesaNegocio()
+    'Private menuNegocio As New MenuNegocio()
+
+    Private procesarPedidosServicio As New ProcesarPedidoServicio()
     Public Property MesaCodigo As String
     Private pedidoCodigo As String
+
+    Dim mesa As New Mesa()
 
 #Region "Inicialización"
 
     Private Sub frmPedidos_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        mesa.MesasCodigo = MesaCodigo
         CrearPedido()
         CargarMenuActivo()
     End Sub
 
     Private Sub CrearPedido()
         Dim empleadoCodigo As String = "EMP00001"
-        pedidoCodigo = pedidoNegocio.CrearPedido(MesaCodigo, empleadoCodigo)
-
-        If String.IsNullOrEmpty(pedidoCodigo) Then
-            MessageBox.Show("Error al crear el pedido.")
-            Me.Close()
-        End If
+        procesarPedidosServicio.CrearPedidoMesaVacia(MesaCodigo, empleadoCodigo)
     End Sub
 
     Private Sub CargarMenuActivo()
-        Dim listaMenu As List(Of Menu) = menuNegocio.ObtenerMenuActivo()
-
+        Dim listaMenu As List(Of Menu) = procesarPedidosServicio.ListarMenuActivo()
         cmbMenu.DisplayMember = "MenuNombre"
         cmbMenu.ValueMember = "MenuCodigo"
         cmbMenu.DataSource = listaMenu
+
     End Sub
 
 #End Region
@@ -69,8 +69,7 @@
     End Sub
 
     Private Sub btnCancelarPedido_Click(sender As Object, e As EventArgs) Handles btnCancelarPedido.Click
-        pedidoNegocio.FinalizarPedido(pedidoCodigo)
-        mesaNegocio.DesocuparMesa(MesaCodigo)
+        procesarPedidosServicio.cancelarElPedido(mesa)
         Me.Close()
     End Sub
 
@@ -90,33 +89,24 @@
             MessageBox.Show("Por favor, ingrese una cantidad válida.")
             Exit Sub
         End If
-        Dim detalle As New DetallePedido With {
-        .DetallesPedidoPedidosCodigo = pedidoCodigo,
-        .DetallesPedidoMenuCodigo = menuSeleccionado.MenuCodigo,
-        .DetallesPedidoCantidad = cantidad,
-        .DetallesPedidoPrecio = menuSeleccionado.MenuPrecio,
-        .Menu = menuSeleccionado
-    }
-        Console.WriteLine("Datos del detalle del pedido:")
-        Console.WriteLine("PedidoCodigo: " & pedidoCodigo)
-        Console.WriteLine("MenuCodigo: " & detalle.DetallesPedidoMenuCodigo)
-        Console.WriteLine("Cantidad: " & detalle.DetallesPedidoCantidad)
-        Console.WriteLine("Precio: " & detalle.DetallesPedidoPrecio)
-        Console.WriteLine("Nombre del Menú: " & detalle.Menu.MenuNombre)
 
-        detalleNegocio.AgregarDetallePedido(pedidoCodigo, detalle)
+        procesarPedidosServicio.agregarDetallePedidos(menuSeleccionado.MenuCodigo, menuSeleccionado.MenuPrecio, cantidad, mesa)
 
-        mesaNegocio.OcuparMesa(MesaCodigo)
-        ActualizarDetallesPedidoGrid(detalle)
+        ' Actualizar la interfaz después de agregar el detalle
+        ActualizarDetallesPedidoGrid(MesaCodigo)
         LimpiarCamposProducto()
+
+
     End Sub
 
-    Private Sub ActualizarDetallesPedidoGrid(detalle As DetallePedido)
-        ' Calcular el total
-        Dim total As Double = detalle.DetallesPedidoCantidad * detalle.DetallesPedidoPrecio
-
-        ' Agregar fila al DataGridView
-        dgvDetallesPedido.Rows.Add(detalle.Menu.MenuNombre, detalle.DetallesPedidoCantidad, detalle.DetallesPedidoPrecio.ToString("C"), total.ToString("C"))
+    Private Sub ActualizarDetallesPedidoGrid(MesaCodigo As String)
+        Try
+            Dim procesarPedido As New ProcesarPedidoServicio()
+            Dim detallesDataTable As DataTable = procesarPedido.ObtenerDetallesPedidoComoDataTable(mesa)
+            dgvDetallesPedido.DataSource = detallesDataTable
+        Catch ex As Exception
+            MessageBox.Show("Error al actualizar detalles del pedido: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
 
     Private Sub LimpiarCamposProducto()

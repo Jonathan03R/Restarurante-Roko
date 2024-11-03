@@ -2,9 +2,9 @@
 Imports System.IO
 
 Public Class frmMenu
-    Private menuNegocio As New MenuNegocio()
+    Private procesoGestionarMenu As New ProcesoGestionarMenuServicio()
 
-    ' Cargar la lista de menús al cargar el formulario
+    Dim menu As New Menu()
     Private Sub frmMenu_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CargarListaMenu()
         btnActualizar.Enabled = False
@@ -15,22 +15,23 @@ Public Class frmMenu
 
     Private Sub CargarListaMenu()
         Try
-            Dim listaMenu As List(Of Menu) = menuNegocio.ObtenerMenu()
+            Dim dtMenu As DataTable = procesoGestionarMenu.MostrarMenu()
 
-            Dim dt As New DataTable()
-            dt.Columns.Add("MenuCodigo", GetType(String))
-            dt.Columns.Add("MenuNombre", GetType(String))
-            dt.Columns.Add("MenuDescripcion", GetType(String))
-            dt.Columns.Add("MenuPrecio", GetType(Double))
-            dt.Columns.Add("MenuEstado", GetType(String))
+            Dim dtFiltrado As New DataTable()
+            dtFiltrado.Columns.Add("MenuCodigo", GetType(String))
+            dtFiltrado.Columns.Add("MenuNombre", GetType(String))
+            dtFiltrado.Columns.Add("MenuDescripcion", GetType(String))
+            dtFiltrado.Columns.Add("MenuPrecio", GetType(Double))
+            dtFiltrado.Columns.Add("MenuEstado", GetType(String))
 
-            For Each menuItem As Menu In listaMenu
-                If menuItem.MenuEstado = "A" Then
-                    Dim estadoTexto As String = "Activo"
-                    dt.Rows.Add(menuItem.MenuCodigo.Trim(), menuItem.MenuNombre, menuItem.MenuDescripcion, menuItem.MenuPrecio, estadoTexto)
+            For Each row As DataRow In dtMenu.Rows
+                If row("MenuEstado").ToString() = "A" Then
+                    dtFiltrado.Rows.Add(row("MenuCodigo").ToString().Trim(), row("MenuNombre"), row("MenuDescripcion"), row("MenuPrecio"), "Activo")
                 End If
             Next
-            dgvMenu.DataSource = dt
+
+            ' Asignar el DataTable filtrado al DataGridView
+            dgvMenu.DataSource = dtFiltrado
             dgvMenu.Columns("MenuCodigo").Visible = False
         Catch ex As Exception
             MessageBox.Show("Error al cargar la lista de menús: " & ex.Message)
@@ -40,22 +41,20 @@ Public Class frmMenu
     Private Sub dgvMenu_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgvMenu.CellClick
         Try
             If e.RowIndex >= 0 Then
-                Dim menuCodigo As String = dgvMenu.Rows(e.RowIndex).Cells("MenuCodigo").Value.ToString().Trim()
+                menu.MenuCodigo = dgvMenu.Rows(e.RowIndex).Cells("MenuCodigo").Value.ToString().Trim()
+                Dim menuSeleccionado As DataTable = procesoGestionarMenu.ObtenerMenuPorCodigoComoDataTable(menu)
+                If menuSeleccionado IsNot Nothing AndAlso menuSeleccionado.Rows.Count > 0 Then
+                    Dim row As DataRow = menuSeleccionado.Rows(0) ' Tomar la primera fila
+                    txtMenuCodigo.Text = row("MenuCodigo").ToString().Trim()
+                    txtMenuNombre.Text = row("MenuNombre").ToString()
+                    txtMenuDescripcion.Text = row("MenuDescripcion").ToString()
+                    txtMenuPrecio.Text = Convert.ToDouble(row("MenuPrecio")).ToString("F2")
 
-                Dim menuSeleccionado As Menu = menuNegocio.ObtenerMenuPorCodigo(menuCodigo)
-
-                If menuSeleccionado IsNot Nothing Then
-                    txtMenuCodigo.Text = menuSeleccionado.MenuCodigo.Trim()
-                    txtMenuNombre.Text = menuSeleccionado.MenuNombre
-                    txtMenuDescripcion.Text = menuSeleccionado.MenuDescripcion
-                    txtMenuPrecio.Text = menuSeleccionado.MenuPrecio.ToString("F2")
-
-                    If menuSeleccionado.MenuFoto IsNot Nothing Then
-                        picMenuFoto.Image = menuSeleccionado.MenuFoto
+                    If Not IsDBNull(row("MenuFoto")) Then
+                        picMenuFoto.Image = CType(row("MenuFoto"), Image)
                     Else
                         picMenuFoto.Image = Nothing
                     End If
-
 
                     btnActualizar.Enabled = True
                     btnGuardar.Enabled = False
@@ -72,27 +71,16 @@ Public Class frmMenu
     ' Evento Click del botón Actualizar
     Private Sub btnActualizar_Click(sender As Object, e As EventArgs) Handles btnActualizar.Click
         Try
-            ' Crear un objeto Menu con los datos actualizados
-            Dim menu As New Menu()
-            menu.MenuCodigo = txtMenuCodigo.Text.Trim()
-            menu.MenuNombre = txtMenuNombre.Text.Trim()
-            menu.MenuDescripcion = txtMenuDescripcion.Text.Trim()
-            menu.MenuPrecio = Convert.ToDouble(txtMenuPrecio.Text.Trim())
-            menu.MenuEstado = "A" ' Asumiendo que deseas mantener el estado como 'A' (Activo)
+            Dim menuCodigo As String = txtMenuCodigo.Text.Trim()
+            Dim menuNombre As String = txtMenuNombre.Text.Trim()
+            Dim menuDescripcion As String = txtMenuDescripcion.Text.Trim()
+            Dim menuPrecio As Double = Convert.ToDouble(txtMenuPrecio.Text.Trim())
+            Dim menuEstado As String = "A"
+            Dim menuFoto As Image = If(picMenuFoto.Image IsNot Nothing, picMenuFoto.Image, Nothing)
 
-            ' Manejar la imagen
-            If picMenuFoto.Image IsNot Nothing Then
-                menu.MenuFoto = picMenuFoto.Image
-            Else
-                menu.MenuFoto = Nothing
-            End If
-
-            ' Llamar al método de negocio para actualizar el menú
-            If menuNegocio.ActualizarMenu(menu) Then
+            If procesoGestionarMenu.ActualizarMenu(menuCodigo, menuNombre, menuDescripcion, menuPrecio, menuEstado, menuFoto) Then
                 MessageBox.Show("Menú actualizado correctamente.")
-                ' Recargar la lista de menús
                 CargarListaMenu()
-                ' Limpiar los controles
                 LimpiarFormulario()
             Else
                 MessageBox.Show("No se pudo actualizar el menú.")
@@ -125,65 +113,61 @@ Public Class frmMenu
     End Sub
 
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
-        Try
-            If String.IsNullOrEmpty(txtMenuCodigo.Text.Trim()) Then
-                MessageBox.Show("Debe ingresar un código para el menú.")
-                Return
-            End If
-            Dim menu As New Menu()
-            menu.MenuCodigo = txtMenuCodigo.Text.Trim()
-            menu.MenuNombre = txtMenuNombre.Text.Trim()
-            menu.MenuDescripcion = txtMenuDescripcion.Text.Trim()
-            menu.MenuPrecio = Convert.ToDouble(txtMenuPrecio.Text.Trim())
-            menu.MenuEstado = "A"
-            If picMenuFoto.Image IsNot Nothing Then
-                menu.MenuFoto = picMenuFoto.Image
-            Else
-                menu.MenuFoto = Nothing
-            End If
+        ' Validaciones de entrada
+        Dim menuNombre As String = txtMenuNombre.Text.Trim()
+        Dim menuDescripcion As String = txtMenuDescripcion.Text.Trim()
+        Dim menuPrecio As Double
 
-            If menuNegocio.InsertarMenu(menu) Then
-                MessageBox.Show("Menú insertado correctamente.")
-                CargarListaMenu()
-                LimpiarFormulario()
-            Else
-                MessageBox.Show("No se pudo insertar el menú.")
-            End If
-        Catch ex As Exception
-            MessageBox.Show("Error al insertar el menú: " & ex.Message)
-        End Try
+        If String.IsNullOrEmpty(menuNombre) Then
+            MessageBox.Show("Debe ingresar un nombre para el menú.")
+            Return
+        End If
+
+        If String.IsNullOrEmpty(menuDescripcion) Then
+            MessageBox.Show("Debe ingresar una descripción para el menú.")
+            Return
+        End If
+
+        If Not Double.TryParse(txtMenuPrecio.Text.Trim(), menuPrecio) OrElse menuPrecio <= 0 Then
+            MessageBox.Show("Debe ingresar un precio válido para el menú.")
+            Return
+        End If
+
+        Dim menuFoto As Image = If(picMenuFoto.Image IsNot Nothing, picMenuFoto.Image, Nothing)
+        If procesoGestionarMenu.InsertarMenu(menuNombre, menuDescripcion, menuPrecio, menuFoto) Then
+            MessageBox.Show("Menú insertado correctamente.")
+            CargarListaMenu()
+            LimpiarFormulario()
+        Else
+            MessageBox.Show("No se pudo insertar el menú.")
+        End If
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        txtMenuCodigo.Text = menuNegocio.GenerarCodigoUnicoMenu()
+        LimpiarFormulario()
+        txtMenuCodigo.Text = procesoGestionarMenu.GenerarCodigoUnicoMenu()
         btnGuardar.Enabled = True
     End Sub
 
     Private Sub btnEliminar_Click(sender As Object, e As EventArgs) Handles btnEliminar.Click
         Try
-            ' Verificar que el campo del código del menú no esté vacío
             If String.IsNullOrEmpty(txtMenuCodigo.Text.Trim()) Then
                 MessageBox.Show("Debe seleccionar un menú para eliminar.")
                 Return
             End If
 
-            ' Confirmar la eliminación del menú
             Dim resultado As DialogResult = MessageBox.Show("¿Está seguro de que desea eliminar este menú?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Warning)
             If resultado = DialogResult.Yes Then
-                ' Crear un objeto Menu con los datos del menú seleccionado
-                Dim menu As New Menu()
-                menu.MenuCodigo = txtMenuCodigo.Text.Trim()
-                menu.MenuNombre = txtMenuNombre.Text.Trim()
-                menu.MenuDescripcion = txtMenuDescripcion.Text.Trim()
-                menu.MenuPrecio = Convert.ToDouble(txtMenuPrecio.Text.Trim())
-                menu.MenuEstado = "E" ' Cambiar el estado a 'E' (Eliminado)
+                Dim menuCodigo As String = txtMenuCodigo.Text.Trim()
+                Dim menuNombre As String = txtMenuNombre.Text.Trim()
+                Dim menuDescripcion As String = txtMenuDescripcion.Text.Trim()
+                Dim menuPrecio As Decimal = Convert.ToDecimal(txtMenuPrecio.Text.Trim())
+                Dim menuEstado As String = "E" ' Cambiar el estado a 'E' para marcarlo como eliminado
+                Dim menuFoto As Image = If(picMenuFoto.Image IsNot Nothing, picMenuFoto.Image, Nothing)
 
-                ' Llamar al método de negocio para actualizar el estado del menú a 'E'
-                If menuNegocio.ActualizarMenu(menu) Then
+                If procesoGestionarMenu.ActualizarMenu(menuCodigo, menuNombre, menuDescripcion, menuPrecio, menuEstado, menuFoto) Then
                     MessageBox.Show("Menú eliminado correctamente (estado cambiado a 'E').")
-                    ' Recargar la lista de menús
                     CargarListaMenu()
-                    ' Limpiar los controles
                     LimpiarFormulario()
                 Else
                     MessageBox.Show("No se pudo eliminar el menú.")

@@ -23,14 +23,6 @@ Partial Class frmClientes
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.tabla = New System.Windows.Forms.DataGridView()
-        Me.Codigo = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Reservas = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Nombres = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Apellidos = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Telefono = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.dni = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Correo = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Fecha_registro = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.btnrestore = New System.Windows.Forms.Button()
         Me.btndelete = New System.Windows.Forms.Button()
         Me.btnActualizar = New System.Windows.Forms.Button()
@@ -49,14 +41,22 @@ Partial Class frmClientes
         Me.txtcodigo = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.btnGuardar = New System.Windows.Forms.Button()
+        Me.generarCodigo = New System.Windows.Forms.Button()
         Me.tablaReservas = New System.Windows.Forms.DataGridView()
+        Me.ReservasBox = New System.Windows.Forms.GroupBox()
+        Me.ClientesCodigo = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Reservas = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ClientesNombre = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ClientesApellidos = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ClientesTelefono = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ClientesDNI = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ClientesCorreo = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ClientesFechaRegistro = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Column1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Column4 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Column3 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Column2 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.ReservasBox = New System.Windows.Forms.GroupBox()
-        Me.generarCodigo = New System.Windows.Forms.Button()
-        Me.btnGuardar = New System.Windows.Forms.Button()
         CType(Me.tabla, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox1.SuspendLayout()
         CType(Me.tablaReservas, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -68,7 +68,7 @@ Partial Class frmClientes
         Me.tabla.AllowUserToAddRows = False
         Me.tabla.AllowUserToDeleteRows = False
         Me.tabla.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.tabla.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Codigo, Me.Reservas, Me.Nombres, Me.Apellidos, Me.Telefono, Me.dni, Me.Correo, Me.Fecha_registro})
+        Me.tabla.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.ClientesCodigo, Me.Reservas, Me.ClientesNombre, Me.ClientesApellidos, Me.ClientesTelefono, Me.ClientesDNI, Me.ClientesCorreo, Me.ClientesFechaRegistro})
         Me.tabla.Location = New System.Drawing.Point(42, 338)
         Me.tabla.MultiSelect = False
         Me.tabla.Name = "tabla"
@@ -76,54 +76,6 @@ Partial Class frmClientes
         Me.tabla.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
         Me.tabla.Size = New System.Drawing.Size(603, 211)
         Me.tabla.TabIndex = 47
-        '
-        'Codigo
-        '
-        Me.Codigo.HeaderText = "Codigo"
-        Me.Codigo.Name = "Codigo"
-        Me.Codigo.ReadOnly = True
-        '
-        'Reservas
-        '
-        Me.Reservas.HeaderText = "Reservas"
-        Me.Reservas.Name = "Reservas"
-        Me.Reservas.ReadOnly = True
-        '
-        'Nombres
-        '
-        Me.Nombres.HeaderText = "Nombres"
-        Me.Nombres.Name = "Nombres"
-        Me.Nombres.ReadOnly = True
-        '
-        'Apellidos
-        '
-        Me.Apellidos.HeaderText = "Apellidos"
-        Me.Apellidos.Name = "Apellidos"
-        Me.Apellidos.ReadOnly = True
-        '
-        'Telefono
-        '
-        Me.Telefono.HeaderText = "Télefono"
-        Me.Telefono.Name = "Telefono"
-        Me.Telefono.ReadOnly = True
-        '
-        'dni
-        '
-        Me.dni.HeaderText = "dni"
-        Me.dni.Name = "dni"
-        Me.dni.ReadOnly = True
-        '
-        'Correo
-        '
-        Me.Correo.HeaderText = "Correo"
-        Me.Correo.Name = "Correo"
-        Me.Correo.ReadOnly = True
-        '
-        'Fecha_registro
-        '
-        Me.Fecha_registro.HeaderText = "Fecha registro"
-        Me.Fecha_registro.Name = "Fecha_registro"
-        Me.Fecha_registro.ReadOnly = True
         '
         'btnrestore
         '
@@ -307,6 +259,24 @@ Partial Class frmClientes
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Datos del Cliente"
         '
+        'btnGuardar
+        '
+        Me.btnGuardar.Location = New System.Drawing.Point(354, 236)
+        Me.btnGuardar.Name = "btnGuardar"
+        Me.btnGuardar.Size = New System.Drawing.Size(75, 23)
+        Me.btnGuardar.TabIndex = 44
+        Me.btnGuardar.Text = "Guardar"
+        Me.btnGuardar.UseVisualStyleBackColor = True
+        '
+        'generarCodigo
+        '
+        Me.generarCodigo.Location = New System.Drawing.Point(206, 28)
+        Me.generarCodigo.Name = "generarCodigo"
+        Me.generarCodigo.Size = New System.Drawing.Size(60, 23)
+        Me.generarCodigo.TabIndex = 43
+        Me.generarCodigo.Text = "generar"
+        Me.generarCodigo.UseVisualStyleBackColor = True
+        '
         'tablaReservas
         '
         Me.tablaReservas.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
@@ -315,26 +285,6 @@ Partial Class frmClientes
         Me.tablaReservas.Name = "tablaReservas"
         Me.tablaReservas.Size = New System.Drawing.Size(437, 170)
         Me.tablaReservas.TabIndex = 51
-        '
-        'Column1
-        '
-        Me.Column1.HeaderText = "Codigo"
-        Me.Column1.Name = "Column1"
-        '
-        'Column4
-        '
-        Me.Column4.HeaderText = "Fecha"
-        Me.Column4.Name = "Column4"
-        '
-        'Column3
-        '
-        Me.Column3.HeaderText = "Estado"
-        Me.Column3.Name = "Column3"
-        '
-        'Column2
-        '
-        Me.Column2.HeaderText = "Codigo Mesa"
-        Me.Column2.Name = "Column2"
         '
         'ReservasBox
         '
@@ -346,23 +296,85 @@ Partial Class frmClientes
         Me.ReservasBox.TabStop = False
         Me.ReservasBox.Text = "Reservas del Clientes"
         '
-        'generarCodigo
+        'ClientesCodigo
         '
-        Me.generarCodigo.Location = New System.Drawing.Point(206, 28)
-        Me.generarCodigo.Name = "generarCodigo"
-        Me.generarCodigo.Size = New System.Drawing.Size(60, 23)
-        Me.generarCodigo.TabIndex = 43
-        Me.generarCodigo.Text = "generar"
-        Me.generarCodigo.UseVisualStyleBackColor = True
+        Me.ClientesCodigo.DataPropertyName = "ClientesCodigo"
+        Me.ClientesCodigo.HeaderText = "Codigo"
+        Me.ClientesCodigo.Name = "ClientesCodigo"
+        Me.ClientesCodigo.ReadOnly = True
         '
-        'btnGuardar
+        'Reservas
         '
-        Me.btnGuardar.Location = New System.Drawing.Point(354, 236)
-        Me.btnGuardar.Name = "btnGuardar"
-        Me.btnGuardar.Size = New System.Drawing.Size(75, 23)
-        Me.btnGuardar.TabIndex = 44
-        Me.btnGuardar.Text = "Guardar"
-        Me.btnGuardar.UseVisualStyleBackColor = True
+        Me.Reservas.DataPropertyName = "Reservas"
+        Me.Reservas.HeaderText = "Reservas"
+        Me.Reservas.Name = "Reservas"
+        Me.Reservas.ReadOnly = True
+        '
+        'ClientesNombre
+        '
+        Me.ClientesNombre.DataPropertyName = "ClientesNombre"
+        Me.ClientesNombre.HeaderText = "Nombres"
+        Me.ClientesNombre.Name = "ClientesNombre"
+        Me.ClientesNombre.ReadOnly = True
+        '
+        'ClientesApellidos
+        '
+        Me.ClientesApellidos.DataPropertyName = "ClientesApellidos"
+        Me.ClientesApellidos.HeaderText = "Apellidos"
+        Me.ClientesApellidos.Name = "ClientesApellidos"
+        Me.ClientesApellidos.ReadOnly = True
+        '
+        'ClientesTelefono
+        '
+        Me.ClientesTelefono.DataPropertyName = "ClientesTelefono"
+        Me.ClientesTelefono.HeaderText = "Télefono"
+        Me.ClientesTelefono.Name = "ClientesTelefono"
+        Me.ClientesTelefono.ReadOnly = True
+        '
+        'ClientesDNI
+        '
+        Me.ClientesDNI.DataPropertyName = "ClientesDNI"
+        Me.ClientesDNI.HeaderText = "dni"
+        Me.ClientesDNI.Name = "ClientesDNI"
+        Me.ClientesDNI.ReadOnly = True
+        '
+        'ClientesCorreo
+        '
+        Me.ClientesCorreo.DataPropertyName = "ClientesCorreo"
+        Me.ClientesCorreo.HeaderText = "Correo"
+        Me.ClientesCorreo.Name = "ClientesCorreo"
+        Me.ClientesCorreo.ReadOnly = True
+        '
+        'ClientesFechaRegistro
+        '
+        Me.ClientesFechaRegistro.DataPropertyName = "ClientesFechaRegistro"
+        Me.ClientesFechaRegistro.HeaderText = "Fecha registro"
+        Me.ClientesFechaRegistro.Name = "ClientesFechaRegistro"
+        Me.ClientesFechaRegistro.ReadOnly = True
+        '
+        'Column1
+        '
+        Me.Column1.DataPropertyName = "ReservasCodigo"
+        Me.Column1.HeaderText = "Codigo"
+        Me.Column1.Name = "Column1"
+        '
+        'Column4
+        '
+        Me.Column4.DataPropertyName = "ReservasFechaHoraReserva"
+        Me.Column4.HeaderText = "Fecha"
+        Me.Column4.Name = "Column4"
+        '
+        'Column3
+        '
+        Me.Column3.DataPropertyName = "ReservasEstado"
+        Me.Column3.HeaderText = "Estado"
+        Me.Column3.Name = "Column3"
+        '
+        'Column2
+        '
+        Me.Column2.DataPropertyName = "ReservasMesasCodigo"
+        Me.Column2.HeaderText = "Codigo Mesa"
+        Me.Column2.Name = "Column2"
         '
         'frmClientes
         '
@@ -404,20 +416,20 @@ Partial Class frmClientes
     Friend WithEvents Label1 As Label
     Friend WithEvents GroupBox1 As GroupBox
     Private WithEvents datefecha As DateTimePicker
-    Friend WithEvents Codigo As DataGridViewTextBoxColumn
-    Friend WithEvents Reservas As DataGridViewTextBoxColumn
-    Friend WithEvents Nombres As DataGridViewTextBoxColumn
-    Friend WithEvents Apellidos As DataGridViewTextBoxColumn
-    Friend WithEvents Telefono As DataGridViewTextBoxColumn
-    Friend WithEvents dni As DataGridViewTextBoxColumn
-    Friend WithEvents Correo As DataGridViewTextBoxColumn
-    Friend WithEvents Fecha_registro As DataGridViewTextBoxColumn
     Friend WithEvents tablaReservas As DataGridView
     Friend WithEvents ReservasBox As GroupBox
+    Friend WithEvents generarCodigo As Button
+    Friend WithEvents btnGuardar As Button
+    Friend WithEvents ClientesCodigo As DataGridViewTextBoxColumn
+    Friend WithEvents Reservas As DataGridViewTextBoxColumn
+    Friend WithEvents ClientesNombre As DataGridViewTextBoxColumn
+    Friend WithEvents ClientesApellidos As DataGridViewTextBoxColumn
+    Friend WithEvents ClientesTelefono As DataGridViewTextBoxColumn
+    Friend WithEvents ClientesDNI As DataGridViewTextBoxColumn
+    Friend WithEvents ClientesCorreo As DataGridViewTextBoxColumn
+    Friend WithEvents ClientesFechaRegistro As DataGridViewTextBoxColumn
     Friend WithEvents Column1 As DataGridViewTextBoxColumn
     Friend WithEvents Column4 As DataGridViewTextBoxColumn
     Friend WithEvents Column3 As DataGridViewTextBoxColumn
     Friend WithEvents Column2 As DataGridViewTextBoxColumn
-    Friend WithEvents generarCodigo As Button
-    Friend WithEvents btnGuardar As Button
 End Class

@@ -9,4 +9,18 @@
     Public Property Mesa As Mesa
     Public Property Cliente As Cliente
 
+
+
+    Public Sub AsignarCodigo(codigo As String)
+        Me.ReservasCodigo = codigo
+    End Sub
+
+    Public Sub Activar()
+        Me.ReservasEstado = "A"
+    End Sub
+
+    Public Function EsFechaValida() As Boolean
+        Return ReservasFechaHoraReserva > DateTime.Now
+    End Function
+
 End Class

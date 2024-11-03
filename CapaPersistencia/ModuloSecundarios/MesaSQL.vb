@@ -1,73 +1,119 @@
 ﻿Imports System.Data.SqlClient
 
 Public Class MesaSQL
+    ' Método para obtener todas las mesas, con opción de filtrar por estado
     Public Function ObtenerMesas(Optional estado As String = Nothing) As List(Of Mesa)
         Dim listaMesas As New List(Of Mesa)
+        Dim procedimientoSQL As String = "spListarMesas"
 
-        Using cn As New SqlConnection(ModuloSistema.cCadenaConexion)
-            Dim cmd As New SqlCommand("spListarMesas", cn)
-            cmd.CommandType = CommandType.StoredProcedure
+        Try
+            ' Obtener el comando usando ModuloSistema
+            Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
 
+            ' Si se especifica un estado, agregar el parámetro correspondiente
             If Not String.IsNullOrEmpty(estado) Then
                 cmd.Parameters.AddWithValue("@MesasEstado", estado)
             End If
 
-            cn.Open()
-            Dim dr As SqlDataReader = cmd.ExecuteReader()
-
-            While dr.Read()
-                Dim estadoMesa As String = dr("MesasEstado").ToString()
-                Dim estadoDescriptivo As String = ""
-
-                Select Case estadoMesa
-                    Case "V"
-                        estadoDescriptivo = "Vacío"
-                    Case "R"
-                        estadoDescriptivo = "Reservado"
-                    Case "O"
-                        estadoDescriptivo = "Ocupado"
-                    Case Else
-                        estadoDescriptivo = estadoMesa
-                End Select
-
-                Dim mesa As New Mesa() With {
-                    .MesasCodigo = dr("MesasCodigo").ToString(),
-                    .MesasCapacidad = Convert.ToInt32(dr("MesasCapacidad")),
-                    .MesasEstado = estadoDescriptivo
-                }
-
-                listaMesas.Add(mesa)
-            End While
-            dr.Close()
-        End Using
+            ' Ejecutar el comando y leer los resultados
+            Using dr As SqlDataReader = cmd.ExecuteReader()
+                While dr.Read()
+                    Dim mesa As New Mesa() With {
+                        .MesasCodigo = dr("MesasCodigo").ToString(),
+                        .MesasCapacidad = Convert.ToInt32(dr("MesasCapacidad")),
+                        .MesasEstado = dr("MesasEstado").ToString()
+                    }
+                    listaMesas.Add(mesa)
+                End While
+            End Using
+        Catch ex As Exception
+            Throw New Exception("Error al obtener mesas: " & ex.Message)
+        End Try
 
         Return listaMesas
     End Function
 
-    Public Sub OcuparMesa(mesaCodigo As String)
-        Using cn As New SqlConnection(ModuloSistema.cCadenaConexion)
-            Dim cmd As New SqlCommand("spOcuparMesa", cn)
-            cmd.CommandType = CommandType.StoredProcedure
 
-            ' Pasar el código de la mesa al procedimiento almacenado
-            cmd.Parameters.AddWithValue("@MesasCodigo", mesaCodigo)
+    Public Function ObtenerMesasComoDataTable(Optional estado As String = Nothing) As DataTable
+        Dim dataTable As New DataTable()
+        Dim procedimientoSQL As String = "spListarMesas"
 
-            ' Abrir conexión y ejecutar el procedimiento para ocupar la mesa
-            cn.Open()
+        Try
+            Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
+            If Not String.IsNullOrEmpty(estado) Then
+                cmd.Parameters.AddWithValue("@MesasEstado", estado)
+            End If
+            Dim adapter As New SqlDataAdapter(cmd)
+            adapter.Fill(dataTable)
+        Catch ex As Exception
+            Throw New Exception("Error al obtener mesas: " & ex.Message)
+        End Try
+
+        Return dataTable
+    End Function
+
+
+
+    ' Método para marcar una mesa como ocupada
+    Public Sub OcuparMesa(mesaCodigo As Mesa)
+        Dim procedimientoSQL As String = "spOcuparMesa"
+
+        Try
+            ' Obtener el comando de procedimiento almacenado
+            Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
+            cmd.Parameters.AddWithValue("@MesasCodigo", mesaCodigo.MesasCodigo)
+
+            ' Ejecutar el comando para ocupar la mesa
             cmd.ExecuteNonQuery()
-            cn.Close()
-        End Using
+        Catch ex As SqlException
+            Throw New Exception("Error al ocupar la mesa: " & ex.Message)
+        End Try
     End Sub
 
-    Public Sub DesocuparMeSA(mesaCodigo As String)
-        Using cn As New SqlConnection(ModuloSistema.cCadenaConexion)
-            Dim cmd As New SqlCommand("spLiberarMesa", cn)
-            cmd.CommandType = CommandType.StoredProcedure
-            cmd.Parameters.AddWithValue("@MesasCodigo", mesaCodigo)
+    ' Método para liberar una mesa
+    Public Sub DesocuparMesa(mesaCodigo As Mesa)
+        Dim procedimientoSQL As String = "spLiberarMesa"
 
-            cn.Open()
+        Try
+            ' Obtener el comando de procedimiento almacenado
+            Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
+            cmd.Parameters.AddWithValue("@MesasCodigo", mesaCodigo.MesasCodigo)
+
+            ' Ejecutar el comando para liberar la mesa
             cmd.ExecuteNonQuery()
-            cn.Close()
-        End Using
+        Catch ex As SqlException
+            Throw New Exception("Error al liberar la mesa: " & ex.Message)
+        End Try
+    End Sub
+
+    ' Método para verificar la disponibilidad de una mesa para una fecha específica
+    Public Function EstaDisponibleParaReservar(mesaCodigo As String, fechaReserva As DateTime) As Boolean
+        Dim procedimientoSQL As String = "spVerificarDisponibilidadMesa"
+
+        Try
+            ' Obtener el comando del procedimiento almacenado
+            Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
+            cmd.Parameters.AddWithValue("@MesasCodigo", mesaCodigo)
+            cmd.Parameters.AddWithValue("@FechaReserva", fechaReserva)
+
+            ' Ejecutar el comando y verificar si la mesa está disponible
+            Dim resultado As Object = cmd.ExecuteScalar()
+            Return Convert.ToInt32(resultado) = 1
+        Catch ex As SqlException
+            Throw New Exception("Error al verificar la disponibilidad de la mesa: " & ex.Message)
+        End Try
+    End Function
+
+    Public Sub ActualizarMesasEstadoReservada()
+        Dim procedimientoSQL As String = "spActualizarEstadoMesasReservadas"
+        Try
+            ' Obtener el comando usando ModuloSistema
+            Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
+
+            ' Ejecutar el procedimiento para actualizar el estado de las mesas
+            cmd.ExecuteNonQuery()
+        Catch ex As Exception
+            Throw New Exception("Error al actualizar el estado de las mesas reservadas: " & ex.Message)
+        End Try
     End Sub
 End Class

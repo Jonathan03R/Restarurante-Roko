@@ -1,5 +1,6 @@
 ﻿Public Class frmHistorialPedidos
-    Private pedidoNegocio As New PedidoNegocio()
+    'Private pedidoNegocio As New PedidoNegocio()
+    Private procesarPedido As New ProcesarPedidoServicio()
 
     Private Sub frmHistorialPedidos_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CargarHistorialPedidos()
@@ -7,18 +8,16 @@
 
     Private Sub CargarHistorialPedidos(Optional filtroEstado As List(Of String) = Nothing)
         Try
-            Dim pedidos As List(Of Pedido) = pedidoNegocio.ObtenerPedidosConDetalle()
+            Dim dtPedidos As DataTable = procesarPedido.ObtenerListadosPedidos()
             If filtroEstado IsNot Nothing AndAlso filtroEstado.Count > 0 Then
-                pedidos = pedidos.Where(Function(p) filtroEstado.Contains(p.PedidosEstado)).ToList()
+                Dim rows = dtPedidos.AsEnumerable().Where(Function(row) filtroEstado.Contains(row.Field(Of String)("EstadoPedido")))
+                If rows.Any() Then
+                    dtPedidos = rows.CopyToDataTable()
+                Else
+                    dtPedidos.Clear()
+                End If
             End If
-            Dim pedidosMostrar = pedidos.Select(Function(p) New With {
-                .CodigoPedido = p.PedidosCodigo,
-                .CodigoMesa = p.PedidosMesasCodigo,
-                .NombreEmpleado = p.Empleado.EmpleadosNombreCompleto,
-                .CargoEmpleado = p.Empleado.RolPermiso.RolesPermisosNombreRol,
-                .EstadoPedido = p.PedidosEstado
-            }).ToList()
-            dgvHistorialPedidos.DataSource = pedidosMostrar
+            dgvHistorialPedidos.DataSource = dtPedidos
             dgvHistorialPedidos.Columns("CodigoPedido").HeaderText = "Código del Pedido"
             dgvHistorialPedidos.Columns("CodigoMesa").HeaderText = "Código de la Mesa"
             dgvHistorialPedidos.Columns("NombreEmpleado").HeaderText = "Nombre del Empleado"

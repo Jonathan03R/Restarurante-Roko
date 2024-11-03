@@ -27,14 +27,6 @@ Partial Class frmEmpleados
         Me.btnupdate = New System.Windows.Forms.Button()
         Me.btnsave = New System.Windows.Forms.Button()
         Me.tabla = New System.Windows.Forms.DataGridView()
-        Me.Codigo = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Nombres = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Telefono = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Sexo = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Cargo = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Entrada = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Fecha_constratacion = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Salario = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.txtsalario = New System.Windows.Forms.TextBox()
         Me.Label10 = New System.Windows.Forms.Label()
         Me.dateContratacion = New System.Windows.Forms.DateTimePicker()
@@ -56,6 +48,18 @@ Partial Class frmEmpleados
         Me.btnGenerarCodigo = New System.Windows.Forms.Button()
         Me.comboRoles = New System.Windows.Forms.ComboBox()
         Me.Label7 = New System.Windows.Forms.Label()
+        Me.EmpleadosCodigo = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.EmpleadosNombreCompleto = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.EmpleadosTelefono = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.EmpleadosSexo = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.RolesPermisosNombreRol = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.EmpleadosHoraEntreada = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.EmpleadosFechaContratacion = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.EmpleadosSalario = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.EmpleadosRolesPermisosCodigo = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.EmpleadosNombres = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.EmpleadosMaterno = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.EmpleadosPaterno = New System.Windows.Forms.DataGridViewTextBoxColumn()
         CType(Me.tabla, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -100,7 +104,7 @@ Partial Class frmEmpleados
         Me.tabla.AllowUserToAddRows = False
         Me.tabla.AllowUserToDeleteRows = False
         Me.tabla.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.tabla.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Codigo, Me.Nombres, Me.Telefono, Me.Sexo, Me.Cargo, Me.Entrada, Me.Fecha_constratacion, Me.Salario})
+        Me.tabla.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.EmpleadosCodigo, Me.EmpleadosNombreCompleto, Me.EmpleadosTelefono, Me.EmpleadosSexo, Me.RolesPermisosNombreRol, Me.EmpleadosHoraEntreada, Me.EmpleadosFechaContratacion, Me.EmpleadosSalario, Me.EmpleadosRolesPermisosCodigo, Me.EmpleadosNombres, Me.EmpleadosMaterno, Me.EmpleadosPaterno})
         Me.tabla.Location = New System.Drawing.Point(39, 313)
         Me.tabla.MultiSelect = False
         Me.tabla.Name = "tabla"
@@ -108,55 +112,6 @@ Partial Class frmEmpleados
         Me.tabla.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
         Me.tabla.Size = New System.Drawing.Size(773, 257)
         Me.tabla.TabIndex = 47
-        '
-        'Codigo
-        '
-        Me.Codigo.HeaderText = "Codigo"
-        Me.Codigo.Name = "Codigo"
-        Me.Codigo.ReadOnly = True
-        '
-        'Nombres
-        '
-        Me.Nombres.HeaderText = "Nombres Completos"
-        Me.Nombres.Name = "Nombres"
-        Me.Nombres.ReadOnly = True
-        Me.Nombres.Width = 200
-        '
-        'Telefono
-        '
-        Me.Telefono.HeaderText = "Telefono"
-        Me.Telefono.Name = "Telefono"
-        Me.Telefono.ReadOnly = True
-        '
-        'Sexo
-        '
-        Me.Sexo.HeaderText = "Sexo"
-        Me.Sexo.Name = "Sexo"
-        Me.Sexo.ReadOnly = True
-        '
-        'Cargo
-        '
-        Me.Cargo.HeaderText = "Cargo"
-        Me.Cargo.Name = "Cargo"
-        Me.Cargo.ReadOnly = True
-        '
-        'Entrada
-        '
-        Me.Entrada.HeaderText = "Entrada"
-        Me.Entrada.Name = "Entrada"
-        Me.Entrada.ReadOnly = True
-        '
-        'Fecha_constratacion
-        '
-        Me.Fecha_constratacion.HeaderText = "Fecha constratacion"
-        Me.Fecha_constratacion.Name = "Fecha_constratacion"
-        Me.Fecha_constratacion.ReadOnly = True
-        '
-        'Salario
-        '
-        Me.Salario.HeaderText = "Salario"
-        Me.Salario.Name = "Salario"
-        Me.Salario.ReadOnly = True
         '
         'txtsalario
         '
@@ -336,6 +291,95 @@ Partial Class frmEmpleados
         Me.Label7.TabIndex = 56
         Me.Label7.Text = "Roles"
         '
+        'EmpleadosCodigo
+        '
+        Me.EmpleadosCodigo.DataPropertyName = "EmpleadosCodigo"
+        Me.EmpleadosCodigo.HeaderText = "Codigo"
+        Me.EmpleadosCodigo.Name = "EmpleadosCodigo"
+        Me.EmpleadosCodigo.ReadOnly = True
+        '
+        'EmpleadosNombreCompleto
+        '
+        Me.EmpleadosNombreCompleto.DataPropertyName = "EmpleadosNombreCompleto"
+        Me.EmpleadosNombreCompleto.HeaderText = "Nombres Completos"
+        Me.EmpleadosNombreCompleto.Name = "EmpleadosNombreCompleto"
+        Me.EmpleadosNombreCompleto.ReadOnly = True
+        Me.EmpleadosNombreCompleto.Width = 200
+        '
+        'EmpleadosTelefono
+        '
+        Me.EmpleadosTelefono.DataPropertyName = "EmpleadosTelefono"
+        Me.EmpleadosTelefono.HeaderText = "Telefono"
+        Me.EmpleadosTelefono.Name = "EmpleadosTelefono"
+        Me.EmpleadosTelefono.ReadOnly = True
+        '
+        'EmpleadosSexo
+        '
+        Me.EmpleadosSexo.DataPropertyName = "EmpleadosSexo"
+        Me.EmpleadosSexo.HeaderText = "Sexo"
+        Me.EmpleadosSexo.Name = "EmpleadosSexo"
+        Me.EmpleadosSexo.ReadOnly = True
+        '
+        'RolesPermisosNombreRol
+        '
+        Me.RolesPermisosNombreRol.DataPropertyName = "RolesPermisosNombreRol"
+        Me.RolesPermisosNombreRol.HeaderText = "Cargo"
+        Me.RolesPermisosNombreRol.Name = "RolesPermisosNombreRol"
+        Me.RolesPermisosNombreRol.ReadOnly = True
+        '
+        'EmpleadosHoraEntreada
+        '
+        Me.EmpleadosHoraEntreada.DataPropertyName = "EmpleadosHoraEntreada"
+        Me.EmpleadosHoraEntreada.HeaderText = "Entrada"
+        Me.EmpleadosHoraEntreada.Name = "EmpleadosHoraEntreada"
+        Me.EmpleadosHoraEntreada.ReadOnly = True
+        '
+        'EmpleadosFechaContratacion
+        '
+        Me.EmpleadosFechaContratacion.DataPropertyName = "EmpleadosFechaContratacion"
+        Me.EmpleadosFechaContratacion.HeaderText = "Fecha constratacion"
+        Me.EmpleadosFechaContratacion.Name = "EmpleadosFechaContratacion"
+        Me.EmpleadosFechaContratacion.ReadOnly = True
+        '
+        'EmpleadosSalario
+        '
+        Me.EmpleadosSalario.DataPropertyName = "EmpleadosSalario"
+        Me.EmpleadosSalario.HeaderText = "Salario"
+        Me.EmpleadosSalario.Name = "EmpleadosSalario"
+        Me.EmpleadosSalario.ReadOnly = True
+        '
+        'EmpleadosRolesPermisosCodigo
+        '
+        Me.EmpleadosRolesPermisosCodigo.DataPropertyName = "EmpleadosRolesPermisosCodigo"
+        Me.EmpleadosRolesPermisosCodigo.HeaderText = "Roles Codigo"
+        Me.EmpleadosRolesPermisosCodigo.Name = "EmpleadosRolesPermisosCodigo"
+        Me.EmpleadosRolesPermisosCodigo.ReadOnly = True
+        Me.EmpleadosRolesPermisosCodigo.Visible = False
+        '
+        'EmpleadosNombres
+        '
+        Me.EmpleadosNombres.DataPropertyName = "EmpleadosNombres"
+        Me.EmpleadosNombres.HeaderText = "Nombre"
+        Me.EmpleadosNombres.Name = "EmpleadosNombres"
+        Me.EmpleadosNombres.ReadOnly = True
+        Me.EmpleadosNombres.Visible = False
+        '
+        'EmpleadosMaterno
+        '
+        Me.EmpleadosMaterno.DataPropertyName = "EmpleadosMaterno"
+        Me.EmpleadosMaterno.HeaderText = "Apellido materno"
+        Me.EmpleadosMaterno.Name = "EmpleadosMaterno"
+        Me.EmpleadosMaterno.ReadOnly = True
+        Me.EmpleadosMaterno.Visible = False
+        '
+        'EmpleadosPaterno
+        '
+        Me.EmpleadosPaterno.DataPropertyName = "EmpleadosPaterno"
+        Me.EmpleadosPaterno.HeaderText = "Apellido Paterno"
+        Me.EmpleadosPaterno.Name = "EmpleadosPaterno"
+        Me.EmpleadosPaterno.ReadOnly = True
+        Me.EmpleadosPaterno.Visible = False
+        '
         'frmEmpleados
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -398,15 +442,19 @@ Partial Class frmEmpleados
     Friend WithEvents Label1 As Label
     Friend WithEvents Label11 As Label
     Friend WithEvents txtApellidoMaterno As TextBox
-    Friend WithEvents Codigo As DataGridViewTextBoxColumn
-    Friend WithEvents Nombres As DataGridViewTextBoxColumn
-    Friend WithEvents Telefono As DataGridViewTextBoxColumn
-    Friend WithEvents Sexo As DataGridViewTextBoxColumn
-    Friend WithEvents Cargo As DataGridViewTextBoxColumn
-    Friend WithEvents Entrada As DataGridViewTextBoxColumn
-    Friend WithEvents Fecha_constratacion As DataGridViewTextBoxColumn
-    Friend WithEvents Salario As DataGridViewTextBoxColumn
     Friend WithEvents btnGenerarCodigo As Button
     Friend WithEvents comboRoles As ComboBox
     Friend WithEvents Label7 As Label
+    Friend WithEvents EmpleadosCodigo As DataGridViewTextBoxColumn
+    Friend WithEvents EmpleadosNombreCompleto As DataGridViewTextBoxColumn
+    Friend WithEvents EmpleadosTelefono As DataGridViewTextBoxColumn
+    Friend WithEvents EmpleadosSexo As DataGridViewTextBoxColumn
+    Friend WithEvents RolesPermisosNombreRol As DataGridViewTextBoxColumn
+    Friend WithEvents EmpleadosHoraEntreada As DataGridViewTextBoxColumn
+    Friend WithEvents EmpleadosFechaContratacion As DataGridViewTextBoxColumn
+    Friend WithEvents EmpleadosSalario As DataGridViewTextBoxColumn
+    Friend WithEvents EmpleadosRolesPermisosCodigo As DataGridViewTextBoxColumn
+    Friend WithEvents EmpleadosNombres As DataGridViewTextBoxColumn
+    Friend WithEvents EmpleadosMaterno As DataGridViewTextBoxColumn
+    Friend WithEvents EmpleadosPaterno As DataGridViewTextBoxColumn
 End Class

@@ -1,56 +1,32 @@
 ﻿Public Class frmReservas
 
-    ' Instancias de las capas de negocio para gestionar clientes, mesas y reservas
-    Dim clienteNegocio As New ClienteNegocio()
-    Dim mesaNegocio As New MesaNegocio()
-    Dim reservaNegocio As New ReservaNegocio()
+    Private procesarReservasServicio As New ProcesarReservacionesServicio()
 
-    ' Control de formulario cargado y lista de reservas
     Private formularioCargado As Boolean = False
     Private listaReservas As List(Of MesaReserva)
-
-    ' Variable para almacenar el estado seleccionado
     Private estadosSeleccionados As String
-
 
 
 #Region "Carga de Datos"
 
     ' Método para cargar la lista de clientes en el DataGridView de clientes
     Private Sub CargarClientes(Optional textoBusqueda As String = "")
-        Dim clientesFiltrados As List(Of Cliente) = clienteNegocio.BuscarClientesPorNombre(textoBusqueda)
-        dgvClientes.Rows.Clear()
-        For Each cliente As Cliente In clientesFiltrados
-            Dim row As String() = {
-                cliente.ClientesCodigo,
-                cliente.ClientesNombreCompleto
-            }
-            dgvClientes.Rows.Add(row)
-        Next
+        dgvClientes.AutoGenerateColumns = False
+        Dim clientesFiltrados As DataTable = procesarReservasServicio.BuscarClientesPorNombre(textoBusqueda)
+        dgvClientes.DataSource = clientesFiltrados
     End Sub
 
     ' Método para cargar la lista de reservas en el DataGridView principal
+    ' Cargar reservas en el DataGridView principal
     Private Sub CargarReservas(Optional estados As String = Nothing)
-        listaReservas = reservaNegocio.ObtenerReservas(estados)
-        tabla.Rows.Clear()
-
-        For Each reserva As MesaReserva In listaReservas
-            Dim row As String() = {
-            reserva.ReservasCodigo,
-            reserva.Cliente.ClientesNombreCompleto,
-            reserva.Mesa.MesasCapacidad.ToString(),
-            reserva.ReservasEstado,
-            reserva.ReservasFechaHoraReserva.ToString("dd/MM/yyyy"),
-            reserva.ReservasFechaHoraReserva.ToString("HH:mm")
-        }
-            tabla.Rows.Add(row)
-        Next
+        tabla.AutoGenerateColumns = False
+        Dim reservasDataTable As DataTable = procesarReservasServicio.ObtenerReservas(estados)
+        tabla.DataSource = reservasDataTable
     End Sub
 
     ' Método para cargar las mesas disponibles en el ComboBox
-    Private Sub CargarMesas(Optional estadoMesas As String = Nothing)
-        Dim listaMesas As List(Of Mesa) = mesaNegocio.ObtenerMesas()
-
+    Private Sub CargarMesas(Optional estadoMesas As String = "V")
+        Dim listaMesas As DataTable = procesarReservasServicio.ObtenerMesas(estadoMesas)
         comboMesas.DataSource = listaMesas
         comboMesas.DisplayMember = "MesasCapacidad"
         comboMesas.ValueMember = "MesasCodigo"
@@ -90,7 +66,7 @@
     Private Sub dgvClientes_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgvClientes.CellClick
         If e.RowIndex >= 0 Then
             Dim filaSeleccionada As DataGridViewRow = dgvClientes.Rows(e.RowIndex)
-            txtcliente.Text = filaSeleccionada.Cells(0).Value.ToString()
+            txtcliente.Text = filaSeleccionada.Cells("CodigoCliente").Value.ToString()
         End If
     End Sub
 
@@ -105,10 +81,10 @@
     ' Evento que genera un nuevo código único de reserva cuando se presiona el botón "Generar"
     Private Sub btnGenerarCodigo_Click(sender As Object, e As EventArgs) Handles btnGenerarCodigo.Click
         Try
-            Dim nuevoCodigo As String = reservaNegocio.GenerarCodigoUnicoReserva()
+            Dim nuevoCodigo As String = procesarReservasServicio.GenerarCodigoUnicoReserva()
             txtcodigo.Text = nuevoCodigo
         Catch ex As Exception
-            MessageBox.Show("Error al generar el código del empleado: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("Error al generar el código de reserva: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
         btnsave.Enabled = True
         btnactualizar.Enabled = False
@@ -120,14 +96,10 @@
     Private Sub btnsave_Click(sender As Object, e As EventArgs) Handles btnsave.Click
         Try
             Dim fechaHoraReserva As DateTime = datefecha.Value.Date + dateTime.Value.TimeOfDay
-            Dim nuevaReserva As New MesaReserva With {
-                .ReservasCodigo = txtcodigo.Text,
-                .ReservasClientesCodigo = txtcliente.Text,
-                .ReservasMesasCodigo = comboMesas.SelectedValue.ToString(),
-                .ReservasFechaHoraReserva = fechaHoraReserva
-            }
+            Dim clienteCodigo As String = txtcliente.Text
+            Dim mesaCodigo As String = comboMesas.SelectedValue.ToString()
 
-            If reservaNegocio.InsertarReserva(nuevaReserva) Then
+            If procesarReservasServicio.RegistrarReserva(clienteCodigo, mesaCodigo, fechaHoraReserva) Then
                 MessageBox.Show("Reserva insertada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 LimpiarCampos()
                 CargarReservas(estadosSeleccionados)
@@ -143,18 +115,13 @@
     ' Evento que maneja la selección de una reserva en el DataGridView principal
     Private Sub tabla_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles tabla.CellClick
         If e.RowIndex >= 0 Then
-            Dim reservaSeleccionada As MesaReserva = listaReservas(e.RowIndex)
-            txtcodigo.Text = reservaSeleccionada.ReservasCodigo
-            txtcliente.Text = reservaSeleccionada.ReservasClientesCodigo
-            Dim codigoMesaSeleccionada As String = reservaSeleccionada.ReservasMesasCodigo
-            If Not String.IsNullOrEmpty(codigoMesaSeleccionada) Then
-                comboMesas.SelectedValue = codigoMesaSeleccionada
-            Else
-                MessageBox.Show("El código de la mesa es nulo o vacío.")
-            End If
-            datefecha.Value = reservaSeleccionada.ReservasFechaHoraReserva.Date
-            dateTime.Value = reservaSeleccionada.ReservasFechaHoraReserva
-            combEstadoReserva.SelectedItem = reservaSeleccionada.ReservasEstado
+            Dim filaSeleccionada As DataGridViewRow = tabla.Rows(e.RowIndex)
+            txtcodigo.Text = filaSeleccionada.Cells("ReservasCodigo").Value.ToString()
+            txtcliente.Text = filaSeleccionada.Cells("ClienteCodigo").Value.ToString()
+            comboMesas.SelectedValue = filaSeleccionada.Cells("ReservasMesasCodigo").Value.ToString()
+            datefecha.Value = Convert.ToDateTime(filaSeleccionada.Cells("ReservasFechaHoraReserva").Value).Date
+            dateTime.Value = Convert.ToDateTime(filaSeleccionada.Cells("ReservasFechaHoraReserva").Value)
+            combEstadoReserva.SelectedItem = filaSeleccionada.Cells("ReservasEstado").Value.ToString()
             btnsave.Enabled = False
             btnactualizar.Enabled = True
             labelEstado.Visible = True
@@ -165,16 +132,12 @@
     ' Evento que actualiza la reserva cuando se presiona el botón "Actualizar"
     Private Sub btnactualizar_Click(sender As Object, e As EventArgs) Handles btnactualizar.Click
         Try
+            Dim reservaCodigo As String = txtcodigo.Text
+            Dim mesaCodigo As String = If(comboMesas.SelectedValue IsNot Nothing, comboMesas.SelectedValue.ToString(), Nothing)
             Dim fechaHoraReserva As DateTime = datefecha.Value.Date + dateTime.Value.TimeOfDay
-            Dim reservaActualizada As New MesaReserva With {
-                .ReservasCodigo = txtcodigo.Text,
-                .ReservasMesasCodigo = If(comboMesas.SelectedValue IsNot Nothing, comboMesas.SelectedValue.ToString(), Nothing),
-                .ReservasFechaHoraReserva = fechaHoraReserva
-            }
             Dim estadoSeleccionado As String = combEstadoReserva.SelectedItem.ToString()
-            reservaActualizada.ReservasEstado = estadoSeleccionado.ToLower()
 
-            If reservaNegocio.ActualizarReserva(reservaActualizada) Then
+            If procesarReservasServicio.ActualizarReserva(reservaCodigo, mesaCodigo, fechaHoraReserva, estadoSeleccionado) Then
                 MessageBox.Show("Reserva actualizada correctamente.", "Actualización", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 CargarReservas(estadosSeleccionados)
                 CargarMesas("V")
@@ -222,16 +185,16 @@
         datefecha.Value = Date.Now
     End Sub
 
-    ' Método para obtener el código del cliente a partir de su nombre completo
-    Public Function ObtenerCodigoClientePorNombre(nombreCompleto As String) As String
-        Dim listaClientes As List(Of Cliente) = clienteNegocio.ObtenerClientesActivos()
-        Dim clienteEncontrado = listaClientes.FirstOrDefault(Function(c) c.ClientesNombreCompleto = nombreCompleto)
-        If clienteEncontrado IsNot Nothing Then
-            Return clienteEncontrado.ClientesCodigo
-        Else
-            Return String.Empty
-        End If
-    End Function
+    '' Método para obtener el código del cliente a partir de su nombre completo
+    'Public Function ObtenerCodigoClientePorNombre(nombreCompleto As String) As String
+    '    Dim listaClientes As List(Of Cliente) = clienteNegocio.ObtenerClientesActivos()
+    '    Dim clienteEncontrado = listaClientes.FirstOrDefault(Function(c) c.ClientesNombreCompleto = nombreCompleto)
+    '    If clienteEncontrado IsNot Nothing Then
+    '        Return clienteEncontrado.ClientesCodigo
+    '    Else
+    '        Return String.Empty
+    '    End If
+    'End Function
 
 #End Region
 
@@ -239,5 +202,9 @@
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         Dim frmClientes As New frmClientes
         frmClientes.ShowDialog()
+    End Sub
+
+    Private Sub dgvClientes_CellContentClick_1(sender As Object, e As DataGridViewCellEventArgs) Handles dgvClientes.CellContentClick
+
     End Sub
 End Class

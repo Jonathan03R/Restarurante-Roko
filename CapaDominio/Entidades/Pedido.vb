@@ -9,4 +9,14 @@
     Public Property Empleado As Empleado
 
 
+    Public Function el_pedido_es_valido() As Boolean
+        If PedidosEstado = "P" Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+
+
 End Class

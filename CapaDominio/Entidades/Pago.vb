@@ -5,9 +5,7 @@
     Public Property PagoMonto As Double
     Public Property PagoFechaPago As String
 
-    Public Property Cliente As Cliente
     Public Property Empleado As Empleado
 
-    Public Sub RegistrarPago()
-    End Sub
+
 End Class

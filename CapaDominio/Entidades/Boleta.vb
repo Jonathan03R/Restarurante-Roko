@@ -8,7 +8,7 @@
 
     Public Property Pedido As Pedido
     Public Property Empleado As Empleado
+    Public Property Cliente As Cliente
 
-    Public Sub EmitirBoleta()
-    End Sub
+
 End Class

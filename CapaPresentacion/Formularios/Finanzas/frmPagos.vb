@@ -214,7 +214,7 @@ Public Class frmPagos
 
     Private Sub AgregarCabeceraEmpresa(doc As Document)
         ' Información de la empresa según tu solicitud
-        Dim titulo As New Paragraph("Restaurante Roko", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 20))
+        Dim titulo As New Paragraph("Restaurante Roko", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 15))
         titulo.Alignment = Element.ALIGN_CENTER
         doc.Add(titulo)
 
@@ -222,76 +222,62 @@ Public Class frmPagos
         subTitulo.Alignment = Element.ALIGN_CENTER
         doc.Add(subTitulo)
 
-        doc.Add(New Paragraph("Dirección: chao-viru", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
-        doc.Add(New Paragraph("Teléfono: 999999999", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
-        doc.Add(New Paragraph("Email: restauranteRoco@gmail.com", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+        doc.Add(New Paragraph("Dirección:          chao-viru", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+        doc.Add(New Paragraph("Teléfono:           999999999", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+        doc.Add(New Paragraph("Email:              restauranteRoco@gmail.com", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
         doc.Add(New Paragraph(" ")) ' Espacio
     End Sub
 
     Private Sub AgregarTotales(doc As Document, row As DataRow)
         doc.Add(New Paragraph(" "))
         Dim tableTotales As New PdfPTable(2)
-        tableTotales.WidthPercentage = 40
+        tableTotales.WidthPercentage = 100
         tableTotales.HorizontalAlignment = Element.ALIGN_RIGHT
-        tableTotales.SetWidths(New Single() {2.0F, 1.0F})
+        tableTotales.SetWidths(New Single() {3.0F, 1.0F})
 
-        tableTotales.AddCell(New Phrase("Total sin IGV:", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
-        tableTotales.AddCell(New Phrase("S/ " & Convert.ToDecimal(row("TotalSinIGV")).ToString("F2"), FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+        tableTotales.AddCell(New Phrase("Total sin IGV:", FontFactory.GetFont(FontFactory.HELVETICA, 8)))
+        tableTotales.AddCell(New Phrase("S/ " & Convert.ToDecimal(row("TotalSinIGV")).ToString("F2"), FontFactory.GetFont(FontFactory.HELVETICA, 8)))
 
-        tableTotales.AddCell(New Phrase("IGV (18%):", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
-        tableTotales.AddCell(New Phrase("S/ " & Convert.ToDecimal(row("IGV")).ToString("F2"), FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+        tableTotales.AddCell(New Phrase("IGV (18%):", FontFactory.GetFont(FontFactory.HELVETICA, 8)))
+        tableTotales.AddCell(New Phrase("S/ " & Convert.ToDecimal(row("IGV")).ToString("F2"), FontFactory.GetFont(FontFactory.HELVETICA, 8)))
 
-        tableTotales.AddCell(New Phrase("Total con IGV:", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
-        tableTotales.AddCell(New Phrase("S/ " & Convert.ToDecimal(row("TotalConIGV")).ToString("F2"), FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
+        tableTotales.AddCell(New Phrase("Total con IGV:", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9)))
+        tableTotales.AddCell(New Phrase("S/ " & Convert.ToDecimal(row("TotalConIGV")).ToString("F2"), FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9)))
 
         doc.Add(tableTotales)
     End Sub
 
     Private Sub AgregarInformacionCliente(doc As Document, row As DataRow)
-        doc.Add(New Paragraph($"Fecha: {Convert.ToDateTime(row("Fecha")).ToString("dd/MM/yyyy")}", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
-        doc.Add(New Paragraph($"Cliente: {row("NombreCliente").ToString()}", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+        doc.Add(New Paragraph($"Fecha: {Convert.ToDateTime(row("Fecha")).ToString("dd/MM/yyyy")}", FontFactory.GetFont(FontFactory.HELVETICA, 8)))
+        doc.Add(New Paragraph($"Cliente: {row("NombreCliente").ToString()}", FontFactory.GetFont(FontFactory.HELVETICA, 8)))
         If row.Table.Columns.Contains("RUCCliente") AndAlso Not String.IsNullOrEmpty(row("RUCCliente").ToString()) Then
-            doc.Add(New Paragraph($"RUC: {row("RUCCliente").ToString()}", FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+            doc.Add(New Paragraph($"RUC: {row("RUCCliente").ToString()}", FontFactory.GetFont(FontFactory.HELVETICA, 8)))
         End If
         doc.Add(New Paragraph(" ")) ' Espacio adicional
     End Sub
 
     Private Sub AgregarTablaDetalles(doc As Document, dtDetalles As DataTable)
-        ' Crear una tabla con 5 columnas: Item, Descripción, Cantidad, Precio Unitario, Precio Total
-        Dim table As New PdfPTable(5)
+        ' Crear una tabla con 4 columnas para adaptarse al ancho de 80mm
+        Dim table As New PdfPTable(4)
         table.WidthPercentage = 100
-        table.SetWidths(New Single() {1.0F, 4.0F, 1.5F, 1.5F, 1.5F}) ' Anchos relativos de las columnas
+        table.SetWidths(New Single() {1.0F, 3.0F, 1.5F, 2.0F}) ' Ajuste de ancho para cada columna
 
         ' Encabezados de la tabla
-        Dim cell As PdfPCell
-        cell = New PdfPCell(New Phrase("Item", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10)))
-        cell.HorizontalAlignment = Element.ALIGN_CENTER
-        table.AddCell(cell)
-
-        cell = New PdfPCell(New Phrase("Descripción", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10)))
-        cell.HorizontalAlignment = Element.ALIGN_CENTER
-        table.AddCell(cell)
-
-        cell = New PdfPCell(New Phrase("Cantidad", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10)))
-        cell.HorizontalAlignment = Element.ALIGN_CENTER
-        table.AddCell(cell)
-
-        cell = New PdfPCell(New Phrase("Precio Unit.", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10)))
-        cell.HorizontalAlignment = Element.ALIGN_CENTER
-        table.AddCell(cell)
-
-        cell = New PdfPCell(New Phrase("Precio Total", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10)))
-        cell.HorizontalAlignment = Element.ALIGN_CENTER
-        table.AddCell(cell)
+        Dim headers As String() = {"Item", "Descripción", "Cant", "Total"}
+        For Each header As String In headers
+            Dim cell As New PdfPCell(New Phrase(header, FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 8)))
+            cell.HorizontalAlignment = Element.ALIGN_CENTER
+            cell.Border = PdfPCell.BOTTOM_BORDER
+            table.AddCell(cell)
+        Next
 
         ' Agregar filas con los detalles
         Dim itemIndex As Integer = 1
         For Each detalleRow As DataRow In dtDetalles.Rows
-            table.AddCell(New Phrase(itemIndex.ToString(), FontFactory.GetFont(FontFactory.HELVETICA, 10)))
-            table.AddCell(New Phrase(detalleRow("MenuNombre").ToString(), FontFactory.GetFont(FontFactory.HELVETICA, 10)))
-            table.AddCell(New Phrase(detalleRow("DetallesPedidoCantidad").ToString(), FontFactory.GetFont(FontFactory.HELVETICA, 10)))
-            table.AddCell(New Phrase(Convert.ToDecimal(detalleRow("DetallesPedidoPrecio")).ToString("F2"), FontFactory.GetFont(FontFactory.HELVETICA, 10)))
-            table.AddCell(New Phrase(Convert.ToDecimal(detalleRow("Total")).ToString("F2"), FontFactory.GetFont(FontFactory.HELVETICA, 10)))
+            table.AddCell(New Phrase(itemIndex.ToString(), FontFactory.GetFont(FontFactory.HELVETICA, 8)))
+            table.AddCell(New Phrase(detalleRow("MenuNombre").ToString(), FontFactory.GetFont(FontFactory.HELVETICA, 8)))
+            table.AddCell(New Phrase(detalleRow("DetallesPedidoCantidad").ToString(), FontFactory.GetFont(FontFactory.HELVETICA, 8)))
+            table.AddCell(New Phrase(Convert.ToDecimal(detalleRow("Total")).ToString("F2"), FontFactory.GetFont(FontFactory.HELVETICA, 8)))
             itemIndex += 1
         Next
 
@@ -300,23 +286,24 @@ Public Class frmPagos
 
     ' Método para generar el PDF de la boleta
     Private Sub GenerarBoletaPDF(dtComprobante As DataTable)
-        Dim nombreArchivo As String = "Boleta_" & PedidoCodigo & ".pdf"
-        Dim rutaArchivo As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), nombreArchivo)
-
-        Dim doc As New Document(PageSize.A4, 40, 40, 40, 20)
+        Dim doc As New Document(New iTextSharp.text.Rectangle(226, 600), 10, 10, 10, 10) ' Formato de ticket
+        Dim ms As New MemoryStream() ' MemoryStream para guardar el PDF en memoria
         Try
-            PdfWriter.GetInstance(doc, New FileStream(rutaArchivo, FileMode.Create))
+            PdfWriter.GetInstance(doc, ms)
             doc.Open()
 
             Dim row As DataRow = dtComprobante.Rows(0)
 
             ' Agregar secciones al documento
             AgregarCabeceraEmpresa(doc)
-            Dim tituloComprobante As New Paragraph("BOLETA DE VENTA", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16))
+
+            ' Título de la Boleta
+            Dim tituloComprobante As New Paragraph("BOLETA DE VENTA", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10))
             tituloComprobante.Alignment = Element.ALIGN_CENTER
             doc.Add(tituloComprobante)
-            doc.Add(New Paragraph("Código de Boleta: " & row("CodigoComprobante").ToString(), FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
-            doc.Add(New Paragraph(" ")) ' Espacio
+
+            doc.Add(New Paragraph("Código de Boleta: " & row("CodigoComprobante").ToString(), FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 8)))
+            doc.Add(New Paragraph(" ")) ' Espacio adicional
             AgregarInformacionCliente(doc, row)
 
             ' Obtener y agregar los detalles del pedido
@@ -327,34 +314,43 @@ Public Class frmPagos
             AgregarTotales(doc, row)
 
             doc.Close()
-            GuardarPDFEnBaseDatos(rutaArchivo, "Boleta")
-            Process.Start(rutaArchivo)
-            MessageBox.Show("Boleta generada correctamente en: " & rutaArchivo)
+
+            ' Guardar el PDF en la base de datos desde el MemoryStream
+            Dim archivoPDF As Byte() = ms.ToArray() ' Convertir el contenido del MemoryStream en un arreglo de bytes
+            GuardarPDFEnBaseDatos(archivoPDF, "Boleta")
+
+            ' Vista previa del PDF generado (guardar en un archivo temporal y abrirlo)
+            Dim rutaTemporal As String = Path.Combine(Path.GetTempPath(), "VistaPrevia_Boleta_" & PedidoCodigo & ".pdf")
+            File.WriteAllBytes(rutaTemporal, archivoPDF) ' Guardar el archivo PDF en la ruta temporal
+
+            ' Abrir el archivo PDF para vista previa
+            Process.Start(rutaTemporal)
+            MessageBox.Show("Boleta generada, guardada en la base de datos y abierta para vista previa.")
 
         Catch ex As Exception
             Throw New Exception("Error al generar la boleta: " & ex.Message)
+        Finally
+            ms.Dispose() ' Liberar el MemoryStream
         End Try
     End Sub
 
     ' Método para generar el PDF de la factura
     Private Sub GenerarFacturaPDF(dtComprobante As DataTable)
-        Dim nombreArchivo As String = "Factura_" & PedidoCodigo & ".pdf"
-        Dim rutaArchivo As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), nombreArchivo)
-
-        Dim doc As New Document(PageSize.A4, 40, 40, 40, 20)
+        Dim doc As New Document(New iTextSharp.text.Rectangle(226, 600), 10, 10, 10, 10) ' Formato de ticket
+        Dim ms As New MemoryStream() ' MemoryStream para guardar el PDF en memoria
         Try
-            PdfWriter.GetInstance(doc, New FileStream(rutaArchivo, FileMode.Create))
+            PdfWriter.GetInstance(doc, ms)
             doc.Open()
 
             Dim row As DataRow = dtComprobante.Rows(0)
 
             ' Agregar secciones al documento
             AgregarCabeceraEmpresa(doc)
-            Dim tituloComprobante As New Paragraph("FACTURA", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16))
+            Dim tituloComprobante As New Paragraph("FACTURA", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10))
             tituloComprobante.Alignment = Element.ALIGN_CENTER
             doc.Add(tituloComprobante)
-            doc.Add(New Paragraph("Código de Factura: " & row("CodigoComprobante").ToString(), FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
-            doc.Add(New Paragraph(" ")) ' Espacio
+            doc.Add(New Paragraph("Código de Factura: " & row("CodigoComprobante").ToString(), FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 8)))
+            doc.Add(New Paragraph(" ")) ' Espacio adicional
             AgregarInformacionCliente(doc, row)
 
             ' Obtener y agregar los detalles del pedido
@@ -363,23 +359,33 @@ Public Class frmPagos
 
             ' Agregar totales
             AgregarTotales(doc, row)
+
             doc.Close()
-            GuardarPDFEnBaseDatos(rutaArchivo, "factura")
-            Process.Start(rutaArchivo)
-            MessageBox.Show("Factura generada correctamente en: " & rutaArchivo)
+
+            ' Guardar el PDF en la base de datos desde el MemoryStream
+            Dim archivoPDF As Byte() = ms.ToArray() ' Convertir el contenido del MemoryStream en un arreglo de bytes
+            GuardarPDFEnBaseDatos(archivoPDF, "Factura")
+
+            ' Vista previa del PDF generado (guardar en un archivo temporal y abrirlo)
+            Dim rutaTemporal As String = Path.Combine(Path.GetTempPath(), "VistaPrevia_Factura_" & PedidoCodigo & ".pdf")
+            File.WriteAllBytes(rutaTemporal, archivoPDF) ' Guardar el archivo PDF en la ruta temporal
+
+            ' Abrir el archivo PDF para vista previa
+            Process.Start(rutaTemporal)
+            MessageBox.Show("Factura generada, guardada en la base de datos y abierta para vista previa.")
+
         Catch ex As Exception
             Throw New Exception("Error al generar la factura: " & ex.Message)
+        Finally
+            ms.Dispose() ' Liberar el MemoryStream
         End Try
     End Sub
 
 
-
-
     'metodo para guardar elñ documento en la base de datos
-    Private Sub GuardarPDFEnBaseDatos(rutaArchivo As String, tipoDocumento As String)
+    Private Sub GuardarPDFEnBaseDatos(archivoPDF As Byte(), tipoDocumento As String)
         Try
-            ' Leer el archivo PDF en un arreglo de bytes
-            Dim archivoPDF As Byte() = File.ReadAllBytes(rutaArchivo)
+
 
             ' Crear el objeto Documento para la base de datos
             Dim nuevoDocumento As New Documento() With {
@@ -391,13 +397,10 @@ Public Class frmPagos
             ' Guardar el documento en la base de datos
             procesoPagoServicio.GuardarDocumentoPDF(nuevoDocumento)
 
-            MessageBox.Show("Documento guardado en la base de datos correctamente.")
         Catch ex As Exception
             Throw New Exception("Error al guardar el documento en la base de datos: " & ex.Message)
         End Try
     End Sub
-
-
 
 
 End Class

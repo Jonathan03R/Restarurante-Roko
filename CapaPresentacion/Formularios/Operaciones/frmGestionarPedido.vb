@@ -1,14 +1,18 @@
-﻿Public Class frmGestionarPedido
+﻿Imports System.IO
+
+Public Class frmGestionarPedido
 
     Private procesarPedidosServicio As New ProcesarPedidoServicio()
     Public Property MesaCodigo As String
     Private pedidoCodigo As String
     Private pedidoFecha As Date
-
+    Dim mesa As New Mesa()
     Private Sub frmGestionarPedido_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        mesa.MesasCodigo = MesaCodigo
         CargarMenuActivo()
         CargarPedidoYDetalles()
-        CargarDetallesPedido(MesaCodigo)
+        CargarDetallesPedido(mesa)
     End Sub
     Private Sub CargarMenuActivo()
         Dim listaMenu As List(Of Menu) = procesarPedidosServicio.ListarMenuActivo()
@@ -27,7 +31,7 @@
     End Sub
 
     Private Sub CargarPedidoYDetalles()
-        Dim pedido As Pedido = procesarPedidosServicio.ObtenerPedidoPorMesa(MesaCodigo)
+        Dim pedido As Pedido = procesarPedidosServicio.ObtenerPedidoPorMesa(mesa)
 
         If pedido IsNot Nothing Then
             pedidoCodigo = pedido.PedidosCodigo
@@ -40,12 +44,11 @@
             lblFecha.Text = pedido.PedidoFecha.ToString()
         Else
             MessageBox.Show("No se encontró un pedido activo para esta mesa.")
-            procesarPedidosServicio.cancelarElPedido(MesaCodigo)
             Me.Close()
         End If
     End Sub
 
-    Private Sub CargarDetallesPedido(mesaCodigo As String)
+    Private Sub CargarDetallesPedido(mesaCodigo As Mesa)
         Try
             Dim detallesDataTable As DataTable = procesarPedidosServicio.ObtenerDetallesPedidoComoDataTable(mesaCodigo)
 
@@ -84,8 +87,9 @@
         End If
         Dim menuSeleccionado As Menu = CType(cmbMenu.SelectedItem, Menu)
 
-        procesarPedidosServicio.agregarDetallePedidos(menuSeleccionado.MenuCodigo, precio, cantidad, MesaCodigo)
-        CargarDetallesPedido(MesaCodigo)
+        Mesa.MesasCodigo = MesaCodigo
+        procesarPedidosServicio.agregarDetallePedidos(menuSeleccionado.MenuCodigo, precio, cantidad, mesa)
+        CargarDetallesPedido(mesa)
         LimpiarControles()
     End Sub
 
@@ -103,7 +107,7 @@
 
             If result = DialogResult.Yes Then
                 procesarPedidosServicio.EliminarDetallePedido(detalleCodigo)
-                CargarDetallesPedido(MesaCodigo)
+                CargarDetallesPedido(mesa)
                 MessageBox.Show("Detalle de pedido eliminado con éxito.", "Eliminado")
             End If
         Else
@@ -112,7 +116,7 @@
     End Sub
 
     Private Sub btnFinalizarPedido_Click(sender As Object, e As EventArgs) Handles btnFinalizarPedido.Click
-        Dim detallesDataTable As DataTable = procesarPedidosServicio.ObtenerDetallesPedidoComoDataTable(MesaCodigo)
+        Dim detallesDataTable As DataTable = procesarPedidosServicio.ObtenerDetallesPedidoComoDataTable(mesa)
 
         Dim montoTotal As Decimal = 0
 

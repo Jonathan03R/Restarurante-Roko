@@ -22,12 +22,12 @@ Public Class PedidoSQL
         End Try
     End Sub
 
-    Public Function ObtenerPedidoPorMesa(mesaCodigo As String) As Pedido
+    Public Function ObtenerPedidoPorMesa(mesaCodigo As Mesa) As Pedido
         Dim pedido As Pedido = Nothing
         Try
             ' Obtener el comando para el procedimiento almacenado desde ModuloSistema
             Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento("spObtenerPedidoPorMesa")
-            cmd.Parameters.AddWithValue("@MesasCodigo", mesaCodigo)
+            cmd.Parameters.AddWithValue("@MesasCodigo", mesaCodigo.MesasCodigo)
 
             ' Ejecutar el comando y leer los resultados
             Using dr As SqlDataReader = cmd.ExecuteReader()
@@ -45,50 +45,13 @@ Public Class PedidoSQL
 
         End Try
 
-        Return Pedido
+        Return pedido
     End Function
 
-    ' Método para completar el pago y finalizar un pedido
-    Public Sub CompletarPagoYFinalizarPedido(pedidoCodigo As String, mesaCodigo As String, pagoCodigo As String, empleadoCodigo As String, monto As Decimal, generarBoleta As Boolean, generarFactura As Boolean, boletaCodigo As String, facturaCodigo As String, boletaClientesCodigo As String, boletaNombreCompletoCliente As String, clienteNombreCompleto As String, clienteRUC As String, mesaCodigoPedido As String)
-        Try
-            Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento("spCompletarPagoYFinalizarPedido")
-
-            ' Parámetros básicos
-            cmd.Parameters.AddWithValue("@PedidosCodigo", pedidoCodigo)
-            cmd.Parameters.AddWithValue("@MesasCodigo", mesaCodigo)
-            cmd.Parameters.AddWithValue("@PagoCodigo", pagoCodigo)
-            cmd.Parameters.AddWithValue("@EmpleadosCodigo", empleadoCodigo)
-            cmd.Parameters.AddWithValue("@Monto", monto)
-            cmd.Parameters.AddWithValue("@GenerarBoleta", generarBoleta)
-            cmd.Parameters.AddWithValue("@GenerarFactura", generarFactura)
-
-            ' Parámetros adicionales según el tipo de documento
-            If generarFactura Then
-                cmd.Parameters.AddWithValue("@ClientesNombreCompleto", clienteNombreCompleto)
-                cmd.Parameters.AddWithValue("@ClientesRUC", clienteRUC)
-                cmd.Parameters.AddWithValue("@FacturaCodigo", facturaCodigo)
-            End If
-
-            If generarBoleta Then
-                cmd.Parameters.AddWithValue("@BoletaCodigo", boletaCodigo)
-                cmd.Parameters.AddWithValue("@BoletaClientesCodigo", boletaClientesCodigo)
-                cmd.Parameters.AddWithValue("@BoletaNombreCompletoCliente", boletaNombreCompletoCliente)
-            End If
-
-            cmd.Parameters.AddWithValue("@PedidoMesaCodigo", mesaCodigoPedido)
-
-            ' Ejecutar el comando
-            cmd.ExecuteNonQuery()
-        Catch ex As Exception
-            Throw New Exception("Error al completar el pago y finalizar el pedido: " & ex.Message)
-
-        End Try
-    End Sub
-
-    Public Sub FinalizarPedido(pedidoCodigo As String)
+    Public Sub FinalizarPedido(pedidoCodigo As Pedido)
         Try
             Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento("spFinalizarPedido")
-            cmd.Parameters.AddWithValue("@PedidosCodigo", pedidoCodigo)
+            cmd.Parameters.AddWithValue("@PedidosCodigo", pedidoCodigo.PedidosCodigo)
 
             cmd.ExecuteNonQuery()
         Catch ex As Exception
@@ -129,13 +92,12 @@ Public Class PedidoSQL
     End Function
 
 
-    Public Function ObtenerComprobantePorPedido(pedidoCodigo As String) As DataTable
+    Public Function ObtenerComprobantePorPedido(pedidoCodigo As Pedido) As DataTable
         Dim dtComprobante As New DataTable()
         Try
             Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento("Restaurante.spObtenerComprobantePorPedido")
-            cmd.Parameters.AddWithValue("@PedidoCodigo", pedidoCodigo)
+            cmd.Parameters.AddWithValue("@PedidoCodigo", pedidoCodigo.PedidosCodigo)
 
-            ' Ejecutar el comando y llenar el DataTable con los resultados
             Using dr As SqlDataReader = cmd.ExecuteReader()
                 dtComprobante.Load(dr)
             End Using

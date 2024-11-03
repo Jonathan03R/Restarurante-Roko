@@ -55,13 +55,13 @@ Public Class MesaSQL
 
 
     ' Método para marcar una mesa como ocupada
-    Public Sub OcuparMesa(mesaCodigo As String)
+    Public Sub OcuparMesa(mesaCodigo As Mesa)
         Dim procedimientoSQL As String = "spOcuparMesa"
 
         Try
             ' Obtener el comando de procedimiento almacenado
             Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
-            cmd.Parameters.AddWithValue("@MesasCodigo", mesaCodigo)
+            cmd.Parameters.AddWithValue("@MesasCodigo", mesaCodigo.MesasCodigo)
 
             ' Ejecutar el comando para ocupar la mesa
             cmd.ExecuteNonQuery()
@@ -71,13 +71,13 @@ Public Class MesaSQL
     End Sub
 
     ' Método para liberar una mesa
-    Public Sub DesocuparMesa(mesaCodigo As String)
+    Public Sub DesocuparMesa(mesaCodigo As Mesa)
         Dim procedimientoSQL As String = "spLiberarMesa"
 
         Try
             ' Obtener el comando de procedimiento almacenado
             Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento(procedimientoSQL)
-            cmd.Parameters.AddWithValue("@MesasCodigo", mesaCodigo)
+            cmd.Parameters.AddWithValue("@MesasCodigo", mesaCodigo.MesasCodigo)
 
             ' Ejecutar el comando para liberar la mesa
             cmd.ExecuteNonQuery()

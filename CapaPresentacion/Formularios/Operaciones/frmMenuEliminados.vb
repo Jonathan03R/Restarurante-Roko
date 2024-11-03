@@ -5,6 +5,8 @@ Public Class frmMenuEliminados
     'Private menuNegocio As New MenuNegocio()
     Private procesoGestionarMenu As New ProcesoGestionarMenuServicio()
 
+    Dim menu As New Menu()
+
     Private Sub frmMenuEliminado_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         lvMenu.View = View.Details
         lvMenu.Columns.Clear()
@@ -45,8 +47,8 @@ Public Class frmMenuEliminados
                 MessageBox.Show("Debe seleccionar un menú para recuperar.")
                 Return
             End If
-            Dim menuCodigo As String = lvMenu.SelectedItems(0).SubItems(0).Text.Trim()
-            Dim result As Boolean = procesoGestionarMenu.ELiminarMenu(menuCodigo)
+            menu.MenuCodigo = lvMenu.SelectedItems(0).SubItems(0).Text.Trim()
+            Dim result As Boolean = procesoGestionarMenu.ELiminarMenu(menu)
             If result Then
                 MessageBox.Show("El menú ha sido recuperado correctamente y ahora está activo.")
             End If

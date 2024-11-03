@@ -113,9 +113,7 @@
 
     Private Sub btnGenerarCodigo_Click(sender As Object, e As EventArgs) Handles btnGenerarCodigo.Click
         Try
-            btnsave.Enabled = True
-            btnupdate.Enabled = False
-            btndelete.Enabled = False
+            LimpiarCampos()
             Dim nuevoCodigo As String = gestionarEmpleadoServicios.GenerarCodigoUnicoEmpleado()
             txtcodigo.Text = nuevoCodigo
         Catch ex As Exception
@@ -151,4 +149,24 @@
             MessageBox.Show("Por favor, selecciona un empleado para eliminar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End If
     End Sub
+    Private Sub LimpiarCampos()
+        ' Limpiar los campos de texto
+        txtcodigo.Text = ""
+        txtApellidoPaterno.Text = ""
+        txtApellidoMaterno.Text = ""
+        txtnombres.Text = ""
+        txttelefono.Text = ""
+        txtentrada.Text = ""
+        txtsalario.Text = ""
+
+        comboSexo.SelectedIndex = -1
+        comboRoles.SelectedIndex = -1
+
+        dateContratacion.Value = DateTime.Now
+
+        btnsave.Enabled = True
+        btnupdate.Enabled = False
+        btndelete.Enabled = False
+    End Sub
+
 End Class

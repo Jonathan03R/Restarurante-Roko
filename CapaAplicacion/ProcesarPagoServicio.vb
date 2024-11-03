@@ -5,8 +5,12 @@ Public Class ProcesarPagoServicio
     Private codigoSQL As New CodigosSQL()
     Private pedidoSQL As New PedidoSQL()
 
+    Private pagoSQL As New PagoSQL()
+    Private mesaSQL As New MesaSQL()
     Private detallesPedidosSQL As New DetallePedidoSQL()
 
+    Private comprobanteSQL As New ComprobantePagoSQL()
+    Private documentosSQL As New DocumentoSQL()
     Public Function buscarClientesPorNombre(nombre As String) As DataTable
         Try
 
@@ -39,76 +43,107 @@ Public Class ProcesarPagoServicio
             Return dataTable
         Catch ex As Exception
             ModuloSistema.CancelarTransaccion()
-            Throw New Exception("Error al buscar clientes por nombre: " & ex.Message)
+            Throw ex
         End Try
     End Function
 
 
-    Public Function CompletarPago(pedidoCodigo As String, mesaCodigo As String, empleadoCodigo As String, monto As Decimal, generarBoleta As Boolean, generarFactura As Boolean, boletaClientesCodigo As String, boletaNombreCompletoCliente As String, clienteNombreCompleto As String, clienteRUC As String, mesaCodigoPedido As String) As String
-        ' Validaciones
-        If String.IsNullOrEmpty(pedidoCodigo) Then
-            Throw New Exception("El código del pedido no puede estar vacío.")
-        End If
-        If String.IsNullOrEmpty(mesaCodigo) Then
-            Throw New Exception("El código de la mesa no puede estar vacío.")
-        End If
-        If String.IsNullOrEmpty(empleadoCodigo) Then
-            Throw New Exception("El código del empleado no puede estar vacío.")
-        End If
-        If monto <= 0 Then
-            Throw New Exception("El monto debe ser mayor a cero.")
-        End If
-        If generarBoleta AndAlso generarFactura Then
-            Throw New Exception("No puede generar ambos, boleta y factura al mismo tiempo.")
-        End If
+    'Public Function CompletarPago(pedidoCodigo As String, mesaCodigo As String, empleadoCodigo As String, monto As Decimal, generarBoleta As Boolean, generarFactura As Boolean, boletaClientesCodigo As String, boletaNombreCompletoCliente As String, clienteNombreCompleto As String, clienteRUC As String, mesaCodigoPedido As String) As String
+    '    ' Validaciones
+    '    If String.IsNullOrEmpty(pedidoCodigo) Then
+    '        Throw New Exception("El código del pedido no puede estar vacío.")
+    '    End If
+    '    If String.IsNullOrEmpty(mesaCodigo) Then
+    '        Throw New Exception("El código de la mesa no puede estar vacío.")
+    '    End If
+    '    If String.IsNullOrEmpty(empleadoCodigo) Then
+    '        Throw New Exception("El código del empleado no puede estar vacío.")
+    '    End If
+    '    If monto <= 0 Then
+    '        Throw New Exception("El monto debe ser mayor a cero.")
+    '    End If
+    '    If generarBoleta AndAlso generarFactura Then
+    '        Throw New Exception("No puede generar ambos, boleta y factura al mismo tiempo.")
+    '    End If
 
-        Dim codigoGenerado As String = String.Empty ' Variable para el código de boleta o factura generado
+    '    Dim codigoGenerado As String = String.Empty ' Variable para el código de boleta o factura generado
+    '    Try
+    '        ModuloSistema.IniciarTransaccion()
+
+    '        Dim pagoCodigo As String = codigoSQL.GenerarCodigoUnico("PAG", "Restaurante.Pago", "PagoCodigo")
+    '        Dim boletaCodigo As String = Nothing
+    '        Dim facturaCodigo As String = Nothing
+
+    '        If generarBoleta Then
+    '            If String.IsNullOrEmpty(boletaClientesCodigo) OrElse String.IsNullOrEmpty(boletaNombreCompletoCliente) Then
+    '                Throw New Exception("El código del cliente y el nombre completo del cliente son obligatorios para generar una boleta.")
+    '            End If
+    '            boletaCodigo = codigoSQL.GenerarCodigoUnico("BOL", "Restaurante.Boletas", "RestauranteBoletasCodigo")
+    '            If String.IsNullOrEmpty(boletaCodigo) Then
+    '                Throw New Exception("No se pudo generar un código de boleta válido.")
+    '            End If
+    '            codigoGenerado = boletaCodigo
+    '        End If
+    '        If generarFactura Then
+    '            If String.IsNullOrEmpty(clienteNombreCompleto) OrElse String.IsNullOrEmpty(clienteRUC) Then
+    '                Throw New Exception("El nombre completo del cliente y el RUC son obligatorios para generar una factura.")
+    '            End If
+    '            facturaCodigo = codigoSQL.GenerarCodigoUnico("FAC", "Restaurante.Facturas", "FacturasCodigo")
+    '            If String.IsNullOrEmpty(facturaCodigo) Then
+    '                Throw New Exception("No se pudo generar un código de factura válido.")
+    '            End If
+    '            codigoGenerado = facturaCodigo
+    '        End If
+
+    '        ' Intentar completar el pago y finalizar el pedido
+    '        pedidoSQL.CompletarPagoYFinalizarPedido(pedidoCodigo, mesaCodigo, pagoCodigo, empleadoCodigo, monto, generarBoleta, generarFactura, boletaCodigo, facturaCodigo, boletaClientesCodigo, boletaNombreCompletoCliente, clienteNombreCompleto, clienteRUC, mesaCodigoPedido)
+    '        ModuloSistema.TerminarTransaccion()
+
+    '        ' Retornar el código generado de boleta o factura
+    '        Return codigoGenerado
+
+    '    Catch ex As Exception
+    '        ModuloSistema.CancelarTransaccion()
+    '        Throw ex
+    '    End Try
+    'End Function
+
+    Public Function completarPago(pago As Pago, pedidoCodigo As Pedido, mesaCodigo As Mesa, boleta As Boleta, factura As Factura, generarBoleta As Boolean, generarFactura As Boolean) As Pedido
         Try
+
             ModuloSistema.IniciarTransaccion()
+            If String.IsNullOrEmpty(pedidoCodigo.PedidosCodigo) Then
+                Throw New Exception("El código del pedido no puede estar vacío.")
+            End If
+            pago.PagoCodigo = codigoSQL.GenerarCodigoUnico("PAG", "Restaurante.Pago", "PagoCodigo")
 
-            ' Generación de códigos de pago, boleta, y factura
-            Dim pagoCodigo As String = codigoSQL.GenerarCodigoUnico("PAG", "Restaurante.Pago", "PagoCodigo")
-            Dim boletaCodigo As String = Nothing
-            Dim facturaCodigo As String = Nothing
+            comprobanteSQL.RegistrarPago(pago)
+            pedidoSQL.FinalizarPedido(pedidoCodigo)
+            mesaSQL.DesocuparMesa(mesaCodigo)
 
-            ' Verificar y generar código de boleta si es necesario
-            If generarBoleta Then
-                If String.IsNullOrEmpty(boletaClientesCodigo) OrElse String.IsNullOrEmpty(boletaNombreCompletoCliente) Then
-                    Throw New Exception("El código del cliente y el nombre completo del cliente son obligatorios para generar una boleta.")
-                End If
-                boletaCodigo = codigoSQL.GenerarCodigoUnico("BOL", "Restaurante.Boletas", "RestauranteBoletasCodigo")
-                If String.IsNullOrEmpty(boletaCodigo) Then
-                    Throw New Exception("No se pudo generar un código de boleta válido.")
-                End If
-                codigoGenerado = boletaCodigo
+            Dim codigoComprobante As String = String.Empty
+
+            If generarBoleta AndAlso Not generarFactura Then
+                boleta.RestauranteBoletasCodigo = codigoSQL.GenerarCodigoUnico("BOL", "Restaurante.Boletas", "RestauranteBoletasCodigo")
+                comprobanteSQL.crearBoleta(boleta)
+            ElseIf generarFactura AndAlso Not generarBoleta Then
+                factura.Pedido.Mesa.MesasCodigo = mesaCodigo.MesasCodigo
+                factura.FacturasCodigo = codigoSQL.GenerarCodigoUnico("FAC", "Restaurante.Facturas", "FacturasCodigo")
+                comprobanteSQL.crearFactura(factura)
+            Else
+                ' Lanzar excepción si ambos o ninguno son seleccionados
+                Throw New Exception("Debe seleccionar solo una opción entre Boleta o Factura.")
             End If
 
-            ' Verificar y generar código de factura si es necesario
-            If generarFactura Then
-                If String.IsNullOrEmpty(clienteNombreCompleto) OrElse String.IsNullOrEmpty(clienteRUC) Then
-                    Throw New Exception("El nombre completo del cliente y el RUC son obligatorios para generar una factura.")
-                End If
-                facturaCodigo = codigoSQL.GenerarCodigoUnico("FAC", "Restaurante.Facturas", "FacturasCodigo")
-                If String.IsNullOrEmpty(facturaCodigo) Then
-                    Throw New Exception("No se pudo generar un código de factura válido.")
-                End If
-                codigoGenerado = facturaCodigo
-            End If
-
-            ' Intentar completar el pago y finalizar el pedido
-            pedidoSQL.CompletarPagoYFinalizarPedido(pedidoCodigo, mesaCodigo, pagoCodigo, empleadoCodigo, monto, generarBoleta, generarFactura, boletaCodigo, facturaCodigo, boletaClientesCodigo, boletaNombreCompletoCliente, clienteNombreCompleto, clienteRUC, mesaCodigoPedido)
             ModuloSistema.TerminarTransaccion()
-
-            ' Retornar el código generado de boleta o factura
-            Return codigoGenerado
-
+            Return pedidoCodigo
         Catch ex As Exception
             ModuloSistema.CancelarTransaccion()
             Throw ex
         End Try
     End Function
 
-    Public Function ObtenerDetallesPedidoComoDataTable(mesaCodigo As String) As DataTable
+    Public Function ObtenerDetallesPedidoComoDataTable(mesaCodigo As Mesa) As DataTable
         Try
             ' Iniciar la transacción para obtener detalles de pedido
             ModuloSistema.IniciarTransaccion()
@@ -144,8 +179,8 @@ Public Class ProcesarPagoServicio
 
             Return dataTable
         Catch ex As Exception
-            Throw New Exception("Error al obtener detalles del pedido: " & ex.Message)
             ModuloSistema.CancelarTransaccion()
+            Throw ex
         End Try
     End Function
     Public Function ObtenerDetallesPedido(codigoPedido As String) As DataTable
@@ -181,14 +216,14 @@ Public Class ProcesarPagoServicio
 
             Return dataTable
         Catch ex As Exception
-            Throw New Exception("Error al obtener detalles del pedido: " & ex.Message)
             ModuloSistema.CancelarTransaccion()
+            Throw ex
         End Try
     End Function
 
 
 
-    Public Function ObtenerComprobantePorPedido(pedidoCodigo As String) As DataTable
+    Public Function ObtenerComprobantePorPedido(pedidoCodigo As Pedido) As DataTable
         Dim dtComprobante As DataTable
         Try
             ModuloSistema.IniciarTransaccion()
@@ -197,8 +232,68 @@ Public Class ProcesarPagoServicio
             Return dtComprobante
 
         Catch ex As Exception
+            Throw ex
             ModuloSistema.CancelarTransaccion()
-            Throw New Exception("Error al obtener el comprobante en la capa de aplicación: " & ex.Message)
         End Try
     End Function
+
+    Public Sub GuardarDocumentoPDF(documento As Documento)
+        Try
+            ModuloSistema.IniciarTransaccion()
+            documento.documentoCodigo = codigoSQL.GenerarCodigoUnico("DOC", "Restaurante.Documentos", "DocumentoCodigo")
+            documentosSQL.agregarDocumento(documento)
+            ModuloSistema.TerminarTransaccion()
+        Catch ex As Exception
+            ModuloSistema.CancelarTransaccion()
+            Throw ex
+        End Try
+    End Sub
+
+    Public Function obtenerDocumentosComoDataTable() As DataTable
+        Try
+            ModuloSistema.IniciarTransaccion()
+
+            Dim documentosSQL As New DocumentoSQL()
+            Dim listaDocumentos As DataTable = documentosSQL.ListarDocumentos()
+
+            Dim dataTable As New DataTable()
+            dataTable.Columns.Add("DocumentoCodigo", GetType(String))
+            dataTable.Columns.Add("DocumentoReferencias", GetType(String))
+            dataTable.Columns.Add("DocumentoTipo", GetType(String))
+            dataTable.Columns.Add("DocumentoFecha", GetType(DateTime))
+
+            For Each row As DataRow In listaDocumentos.Rows
+                dataTable.Rows.Add(
+                row("DocumentoCodigo").ToString(),
+                row("DocumentoReferencias").ToString(),
+                row("DocumentoTipo").ToString(),
+                Convert.ToDateTime(row("DocumentoFecha"))
+            )
+            Next
+            ModuloSistema.TerminarTransaccion()
+            Return dataTable
+
+        Catch ex As Exception
+            ModuloSistema.CancelarTransaccion()
+            Throw New Exception("Error al obtener los documentos como DataTable: " & ex.Message)
+        End Try
+    End Function
+
+
+    Public Function ObtenerDocumentoPDF(documentoCodigo As String) As Byte()
+        Try
+            ModuloSistema.IniciarTransaccion()
+
+            Dim archivoPDF As Byte() = documentosSQL.ObtenerDocumentoPDF(New Documento With {.documentoCodigo = documentoCodigo})
+
+            ModuloSistema.TerminarTransaccion()
+
+            Return archivoPDF
+        Catch ex As Exception
+            ModuloSistema.CancelarTransaccion()
+            Throw New Exception("Error al obtener el documento PDF desde la capa de aplicación: " & ex.Message)
+        End Try
+    End Function
+
+
 End Class

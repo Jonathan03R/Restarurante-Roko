@@ -3,6 +3,8 @@ Imports System.IO
 
 Public Class frmMenu
     Private procesoGestionarMenu As New ProcesoGestionarMenuServicio()
+
+    Dim menu As New Menu()
     Private Sub frmMenu_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CargarListaMenu()
         btnActualizar.Enabled = False
@@ -39,8 +41,8 @@ Public Class frmMenu
     Private Sub dgvMenu_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgvMenu.CellClick
         Try
             If e.RowIndex >= 0 Then
-                Dim menuCodigo As String = dgvMenu.Rows(e.RowIndex).Cells("MenuCodigo").Value.ToString().Trim()
-                Dim menuSeleccionado As DataTable = procesoGestionarMenu.ObtenerMenuPorCodigoComoDataTable(menuCodigo)
+                menu.MenuCodigo = dgvMenu.Rows(e.RowIndex).Cells("MenuCodigo").Value.ToString().Trim()
+                Dim menuSeleccionado As DataTable = procesoGestionarMenu.ObtenerMenuPorCodigoComoDataTable(menu)
                 If menuSeleccionado IsNot Nothing AndAlso menuSeleccionado.Rows.Count > 0 Then
                     Dim row As DataRow = menuSeleccionado.Rows(0) ' Tomar la primera fila
                     txtMenuCodigo.Text = row("MenuCodigo").ToString().Trim()
@@ -142,6 +144,7 @@ Public Class frmMenu
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        LimpiarFormulario()
         txtMenuCodigo.Text = procesoGestionarMenu.GenerarCodigoUnicoMenu()
         btnGuardar.Enabled = True
     End Sub

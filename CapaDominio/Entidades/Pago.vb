@@ -1,11 +1,9 @@
 ﻿Public Class Pago
     Public Property PagoCodigo As String
-    Public Property PagoClientesCodigo As String
-    Public Property PagoEmpleadosCodigo As String
     Public Property PagoMonto As Double
     Public Property PagoFechaPago As String
+    Public Property PagoEstadoas As String
 
-    Public Property Empleado As Empleado
-
+    Public Property pedido As Pedido
 
 End Class

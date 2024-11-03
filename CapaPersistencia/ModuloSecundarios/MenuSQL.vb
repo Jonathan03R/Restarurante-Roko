@@ -40,12 +40,12 @@ Public Class MenuSQL
     End Function
 
     ' Método para obtener un menú específico por su código
-    Public Function ObtenerMenuPorCodigo(menuCodigo As String) As Menu
+    Public Function ObtenerMenuPorCodigo(menuCodigo As Menu) As Menu
         Dim menu As Menu = Nothing
 
         Try
             Dim cmd As SqlCommand = ModuloSistema.ObtenerComandoDeProcedimiento("spObtenerMenuPorCodigo")
-            cmd.Parameters.Add("@MenuCodigo", SqlDbType.NChar, 8).Value = menuCodigo.Trim()
+            cmd.Parameters.Add("@MenuCodigo", SqlDbType.NChar, 8).Value = menuCodigo.MenuCodigo.Trim()
 
             Using dr As SqlDataReader = cmd.ExecuteReader()
                 If dr.Read() Then

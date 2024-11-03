@@ -225,6 +225,7 @@
     <Compile Include="CapaDominio\Entidades\Boleta.vb" />
     <Compile Include="CapaDominio\Entidades\Cliente.vb" />
     <Compile Include="CapaDominio\Entidades\DetallePedido.vb" />
+    <Compile Include="CapaDominio\Entidades\Documento.vb" />
     <Compile Include="CapaDominio\Entidades\Empleado.vb" />
     <Compile Include="CapaDominio\Entidades\Factura.vb" />
     <Compile Include="CapaDominio\Entidades\HistorialPedido.vb" />
@@ -236,26 +237,17 @@
     <Compile Include="CapaDominio\Entidades\RolPermiso.vb" />
     <Compile Include="CapaPersistencia\ModuloSecundarios\ClienteSQL.vb" />
     <Compile Include="CapaPersistencia\ModuloSecundarios\CodigosSQL.vb" />
+    <Compile Include="CapaPersistencia\ModuloSecundarios\ComprobantePagoSQL.vb" />
     <Compile Include="CapaPersistencia\ModuloSecundarios\DetallePedidoSQL.vb" />
+    <Compile Include="CapaPersistencia\ModuloSecundarios\DocumentoSQL.vb" />
     <Compile Include="CapaPersistencia\ModuloSecundarios\EmpleadoSQL.vb" />
     <Compile Include="CapaPersistencia\ModuloSecundarios\HistorialSQL.vb" />
     <Compile Include="CapaPersistencia\ModuloSecundarios\MenuSQL.vb" />
     <Compile Include="CapaPersistencia\ModuloSecundarios\MesaSQL.vb" />
+    <Compile Include="CapaPersistencia\ModuloSecundarios\PagoSQL.vb" />
     <Compile Include="CapaPersistencia\ModuloSecundarios\PedidoSQL.vb" />
     <Compile Include="CapaPersistencia\ModuloSecundarios\ReservaSQL.vb" />
     <Compile Include="CapaPersistencia\ModuloSecundarios\RolPermisoSQL.vb" />
-    <Compile Include="CapaPresentacion\Formularios\Finanzas\frmBoletas.Designer.vb">
-      <DependentUpon>frmBoletas.vb</DependentUpon>
-    </Compile>
-    <Compile Include="CapaPresentacion\Formularios\Finanzas\frmBoletas.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="CapaPresentacion\Formularios\Finanzas\frmFacturas.Designer.vb">
-      <DependentUpon>frmFacturas.vb</DependentUpon>
-    </Compile>
-    <Compile Include="CapaPresentacion\Formularios\Finanzas\frmFacturas.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="CapaPresentacion\Formularios\Finanzas\frmPagos.Designer.vb">
       <DependentUpon>frmPagos.vb</DependentUpon>
     </Compile>
@@ -382,12 +374,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="CapaPresentacion\Formularios\Finanzas\frmBoletas.resx">
-      <DependentUpon>frmBoletas.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="CapaPresentacion\Formularios\Finanzas\frmFacturas.resx">
-      <DependentUpon>frmFacturas.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="CapaPresentacion\Formularios\Finanzas\frmPagos.resx">
       <DependentUpon>frmPagos.vb</DependentUpon>
     </EmbeddedResource>
@@ -462,10 +448,10 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="ascents\iconos\" />
-  </ItemGroup>
-  <ItemGroup>
+    <Content Include="ascents\iconos\pdf.ico" />
+    <Content Include="ascents\imagenes\pdf.png" />
     <Content Include="ascents\imagenes\Restaurante.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

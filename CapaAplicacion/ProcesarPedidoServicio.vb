@@ -1,6 +1,4 @@
-﻿'El servicio mas amplio tendra la obtencion y procesos necesarios para procesar un peedido xd
-
-Imports System.Net.Configuration
+﻿Imports System.Net.Configuration
 
 Public Class ProcesarPedidoServicio
     Private mesasSQL As New MesaSQL()
@@ -9,7 +7,6 @@ Public Class ProcesarPedidoServicio
     Private codigoSQL As New CodigosSQL()
     Private menuSQL As New MenuSQL()
     'necesitamos primero listar todas las mesas para poder verlas en la interfaz
-
 
     Public Function ObtenerMesas(Optional estadoMesas As String = Nothing) As DataTable
         Try
@@ -61,10 +58,10 @@ Public Class ProcesarPedidoServicio
     End Function
 
     'luego segun las elecciones se agrega un detalle pedido: 
-    Public Sub agregarDetallePedidos(menuCodigo As String, precio As Double, cantidad As Integer, codigoMesa As String)
+    Public Sub agregarDetallePedidos(menuCodigo As String, precio As Double, cantidad As Integer, codigoMesa As Mesa)
         Try
 
-            Debug.WriteLine("datos " & menuCodigo & " " & precio.ToString() & " " & cantidad.ToString() & " " & codigoMesa)
+            Debug.WriteLine("datos " & menuCodigo & " " & precio.ToString() & " " & cantidad.ToString() & " " & codigoMesa.MesasCodigo)
             If String.IsNullOrWhiteSpace(menuCodigo) Then
                 Throw New ArgumentException("El código del menú no puede estar vacío.")
             End If
@@ -77,7 +74,7 @@ Public Class ProcesarPedidoServicio
                 Throw New ArgumentException("La cantidad debe ser mayor que cero.")
             End If
 
-            If String.IsNullOrWhiteSpace(codigoMesa) Then
+            If String.IsNullOrWhiteSpace(codigoMesa.MesasCodigo) Then
                 Throw New ArgumentException("El código de la mesa no puede estar vacío.")
             End If
 
@@ -110,7 +107,7 @@ Public Class ProcesarPedidoServicio
     End Sub
 
     'me tiene que devolver los detalles del pedido que esta actualmente en la mesa ocupada
-    Public Function ObtenerDetallesPedidoComoDataTable(mesaCodigo As String) As DataTable
+    Public Function ObtenerDetallesPedidoComoDataTable(mesaCodigo As Mesa) As DataTable
         Try
             ' Iniciar la transacción para obtener detalles de pedido
             ModuloSistema.IniciarTransaccion()
@@ -152,9 +149,9 @@ Public Class ProcesarPedidoServicio
     End Function
 
     'imaginando que el cliente ya no quiere el pedido :C procede a cancelarse
-    Public Sub cancelarElPedido(codigoMesa As String)
+    Public Sub cancelarElPedido(codigoMesa As Mesa)
         Try
-            If String.IsNullOrWhiteSpace(codigoMesa) Then
+            If String.IsNullOrWhiteSpace(codigoMesa.MesasCodigo) Then
                 Throw New ArgumentException("El código de la mesa no puede estar vacío.")
             End If
             ModuloSistema.IniciarTransaccion()
@@ -162,7 +159,7 @@ Public Class ProcesarPedidoServicio
             If pedido Is Nothing OrElse String.IsNullOrWhiteSpace(pedido.PedidosCodigo) Then
                 Throw New Exception("No se encontró un pedido activo para la mesa especificada.")
             End If
-            pedidoSQL.FinalizarPedido(pedido.PedidosCodigo)
+            pedidoSQL.FinalizarPedido(pedido)
             mesasSQL.DesocuparMesa(codigoMesa)
             ModuloSistema.TerminarTransaccion()
         Catch ex As Exception
@@ -176,13 +173,23 @@ Public Class ProcesarPedidoServicio
     '**********************************************************************************
     'cuando la mesa esta ocupada, entonces:
 
-    Public Function ObtenerPedidoPorMesa(mesaCodigo As String) As Pedido
+    Public Function ObtenerPedidoPorMesa(mesaCodigo As Mesa) As Pedido
         Try
-            If String.IsNullOrWhiteSpace(mesaCodigo) Then
+            If String.IsNullOrWhiteSpace(mesaCodigo.MesasCodigo) Then
                 Throw New ArgumentException("El código de la mesa no puede estar vacío.")
             End If
             ModuloSistema.IniciarTransaccion()
             Dim pedido As Pedido = pedidoSQL.ObtenerPedidoPorMesa(mesaCodigo)
+            If pedido Is Nothing Then
+                mesasSQL.DesocuparMesa(mesaCodigo)
+                ModuloSistema.TerminarTransaccion()
+                Return Nothing
+            End If
+            If Not pedido.el_pedido_es_valido() Then
+                mesasSQL.DesocuparMesa(mesaCodigo)
+                ModuloSistema.TerminarTransaccion()
+                Return Nothing
+            End If
             ModuloSistema.TerminarTransaccion()
             Return pedido
 

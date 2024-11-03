@@ -9,9 +9,12 @@
     Public Property MesaCodigo As String
     Private pedidoCodigo As String
 
+    Dim mesa As New Mesa()
+
 #Region "Inicialización"
 
     Private Sub frmPedidos_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        mesa.MesasCodigo = MesaCodigo
         CrearPedido()
         CargarMenuActivo()
     End Sub
@@ -66,7 +69,7 @@
     End Sub
 
     Private Sub btnCancelarPedido_Click(sender As Object, e As EventArgs) Handles btnCancelarPedido.Click
-        procesarPedidosServicio.cancelarElPedido(MesaCodigo)
+        procesarPedidosServicio.cancelarElPedido(mesa)
         Me.Close()
     End Sub
 
@@ -87,7 +90,7 @@
             Exit Sub
         End If
 
-        procesarPedidosServicio.agregarDetallePedidos(menuSeleccionado.MenuCodigo, menuSeleccionado.MenuPrecio, cantidad, MesaCodigo)
+        procesarPedidosServicio.agregarDetallePedidos(menuSeleccionado.MenuCodigo, menuSeleccionado.MenuPrecio, cantidad, mesa)
 
         ' Actualizar la interfaz después de agregar el detalle
         ActualizarDetallesPedidoGrid(MesaCodigo)
@@ -99,7 +102,7 @@
     Private Sub ActualizarDetallesPedidoGrid(MesaCodigo As String)
         Try
             Dim procesarPedido As New ProcesarPedidoServicio()
-            Dim detallesDataTable As DataTable = procesarPedido.ObtenerDetallesPedidoComoDataTable(MesaCodigo)
+            Dim detallesDataTable As DataTable = procesarPedido.ObtenerDetallesPedidoComoDataTable(mesa)
             dgvDetallesPedido.DataSource = detallesDataTable
         Catch ex As Exception
             MessageBox.Show("Error al actualizar detalles del pedido: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)

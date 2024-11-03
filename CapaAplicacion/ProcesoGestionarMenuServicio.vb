@@ -2,6 +2,8 @@
     Private menuSQL As New MenuSQL()
     Private codigoSQL As New CodigosSQL()
 
+    Dim menu As New Menu()
+
     Public Function MostrarMenu() As DataTable
         Try
 
@@ -35,9 +37,9 @@
         End Try
     End Function
 
-    Public Function ObtenerMenuPorCodigoComoDataTable(menuCodigo As String) As DataTable
+    Public Function ObtenerMenuPorCodigoComoDataTable(menuCodigo As Menu) As DataTable
         Try
-            If String.IsNullOrWhiteSpace(menuCodigo) Then
+            If String.IsNullOrWhiteSpace(menuCodigo.MenuCodigo) Then
                 Throw New ArgumentException("El código del menú no puede estar vacío.")
             End If
             ModuloSistema.IniciarTransaccion()
@@ -149,7 +151,7 @@
     End Function
 
     'proceso para eliminar un menu
-    Public Function ELiminarMenu(menuCodigo As String) As Boolean
+    Public Function ELiminarMenu(menuCodigo As Menu) As Boolean
         Try
             ModuloSistema.IniciarTransaccion()
             Dim menu As Menu = menuSQL.ObtenerMenuPorCodigo(menuCodigo)

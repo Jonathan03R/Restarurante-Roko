@@ -111,18 +111,18 @@
 
 #Region "FinanzasOpciones"
 
-    Private Sub FinanzasOpciones(sender As Object, e As EventArgs)
+    Private Sub FinanzasOpciones(sender As Object, e As EventArgs) _
+        Handles mnuPagos.Click
+        If sender Is mnuPagos Then
+            Pagos()
+        End If
 
     End Sub
 
-    Private Sub Boleta()
-        Dim frmBoleta As Form = New frmBoletas
-        frmBoletas.MdiParent = Me
-        frmBoletas.Show()
-    End Sub
+
 
     Private Sub Pagos()
-        Dim frmPago As Form = New frmPagos
+        Dim frmPago As Form = New frmPagosHistorial
         frmPago.MdiParent = Me
         frmPago.Show()
     End Sub
@@ -167,7 +167,7 @@
 
     End Sub
 
-    Private Sub mnuFacturas_Click(sender As Object, e As EventArgs) Handles mnuFacturas.Click
+    Private Sub mnuFacturas_Click(sender As Object, e As EventArgs)
         MessageBox.Show("Aun esta en desarrollo", "Historial de Facturas", MessageBoxButtons.OK, MessageBoxIcon.Information)
     End Sub
 
@@ -188,15 +188,7 @@
 
     End Sub
 
-    Private Sub mnuPagos_Click(sender As Object, e As EventArgs) Handles mnuPagos.Click
-        MessageBox.Show("Aun esta en desarrollo", "Pagos", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
-    End Sub
-
-    Private Sub mnuBoleta_Click(sender As Object, e As EventArgs) Handles mnuBoleta.Click
-        MessageBox.Show("Aun esta en desarrollo", "Historial de Boletas", MessageBoxButtons.OK, MessageBoxIcon.Information)
-
-    End Sub
 #End Region
 
 

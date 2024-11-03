@@ -75,34 +75,52 @@ Public Class frmPagos
     End Sub
 
     Private Sub btnFinalizarPago_Click(sender As Object, e As EventArgs) Handles btnFinalizarPago.Click
+
         Try
             If Not ValidarEntradas() Then Exit Sub
 
-            Dim montoDecimal As Decimal = ObtenerMonto()
-            If montoDecimal <= 0 Then Exit Sub
+            Dim pago As New Pago()
+            Dim pedido As New Pedido()
+            Dim mesa As New Mesa()
+            Dim factura As New Factura()
+
+            Dim boleta As New Boleta()
+            boleta.Cliente = New Cliente()
+            boleta.Empleado = New Empleado()
+
+            pedido.PedidosCodigo = PedidoCodigo
+            pago.pedido = pedido ' Inicializar la propiedad 'pedido' en 'pago'
+            mesa.MesasCodigo = MesaCodigo
+
+            pedido.Mesa = mesa
+            factura.Pedido = pedido
+            factura.Pedido.Mesa = mesa
+
+            pago.PagoMonto = ObtenerMonto()
+            If pago.PagoMonto <= 0 Then Exit Sub
 
             Dim clienteInfo As Dictionary(Of String, String) = ObtenerInformacionCliente()
             If clienteInfo Is Nothing Then Exit Sub
 
-            ' Llamada al método de completar pago en la capa de negocio y obtener el código generado
-            Dim codigoGenerado As String = procesoPagoServicio.CompletarPago(
-            PedidoCodigo,
-            MesaCodigo,
-            lblEmpleadoCodigo.Text,
-            montoDecimal,
-            rbtnBoleta.Checked,
-            rbtnFactura.Checked,
-            codigoCliente,
-            lblClienteNombre.Text,
-            clienteInfo("Nombre"),
-            clienteInfo("RUC"),
-            MesaCodigo
-        )
+            boleta.Cliente.ClientesCodigo = codigoCliente
+            boleta.RestauranteBoletasClienteNombreCompleto = clienteInfo("Nombre")
+            boleta.Empleado.EmpleadosCodigo = lblEmpleadoCodigo.Text
+            boleta.Pedido = pedido
+            boleta.RestauranteBoletasTotal = pago.PagoMonto
 
-            ' Obtener y generar el comprobante de pago
-            GenerarComprobante(PedidoCodigo)
+            factura.Pedido = pedido
+            factura.FacturaEmpresaCliente = clienteInfo("Nombre")
+            factura.FacturaRuc = clienteInfo("RUC")
+            factura.FacturasTotal = pago.PagoMonto
 
-            MessageBox.Show("Pago y finalización del pedido completados.")
+            Dim generarBoleta As Boolean = rbtnBoleta.Checked
+            Dim generarFactura As Boolean = rbtnFactura.Checked
+            Dim pedidoCompletado As Pedido = procesoPagoServicio.completarPago(pago, pedido, mesa, boleta, factura, generarBoleta, generarFactura)
+
+            ' Mostrar el comprobante generado
+            GenerarComprobante(pedidoCompletado)
+
+            MessageBox.Show("Pago y finalización del pedido completados. Código del pedido: " & pedidoCompletado.PedidosCodigo)
             Me.Close()
         Catch ex As Exception
             MessageBox.Show("Error: " & ex.Message)
@@ -169,7 +187,7 @@ Public Class frmPagos
         Return infoCliente
     End Function
     ' Método para generar el comprobante de pago en formato PDF
-    Private Sub GenerarComprobante(pedidoCodigo As String)
+    Private Sub GenerarComprobante(pedidoCodigo As Pedido)
         Dim dtComprobante As DataTable = procesoPagoServicio.ObtenerComprobantePorPedido(pedidoCodigo)
 
         If dtComprobante.Rows.Count > 0 Then
@@ -309,8 +327,10 @@ Public Class frmPagos
             AgregarTotales(doc, row)
 
             doc.Close()
+            GuardarPDFEnBaseDatos(rutaArchivo, "Boleta")
             Process.Start(rutaArchivo)
             MessageBox.Show("Boleta generada correctamente en: " & rutaArchivo)
+
         Catch ex As Exception
             Throw New Exception("Error al generar la boleta: " & ex.Message)
         End Try
@@ -343,13 +363,41 @@ Public Class frmPagos
 
             ' Agregar totales
             AgregarTotales(doc, row)
-
             doc.Close()
+            GuardarPDFEnBaseDatos(rutaArchivo, "factura")
             Process.Start(rutaArchivo)
             MessageBox.Show("Factura generada correctamente en: " & rutaArchivo)
         Catch ex As Exception
             Throw New Exception("Error al generar la factura: " & ex.Message)
         End Try
     End Sub
+
+
+
+
+    'metodo para guardar elñ documento en la base de datos
+    Private Sub GuardarPDFEnBaseDatos(rutaArchivo As String, tipoDocumento As String)
+        Try
+            ' Leer el archivo PDF en un arreglo de bytes
+            Dim archivoPDF As Byte() = File.ReadAllBytes(rutaArchivo)
+
+            ' Crear el objeto Documento para la base de datos
+            Dim nuevoDocumento As New Documento() With {
+                .documetoReferencias = PedidoCodigo,
+                .documentoTipo = tipoDocumento,
+                .documentoPDF = archivoPDF  ' Asigna el PDF directamente como arreglo de bytes
+            }
+
+            ' Guardar el documento en la base de datos
+            procesoPagoServicio.GuardarDocumentoPDF(nuevoDocumento)
+
+            MessageBox.Show("Documento guardado en la base de datos correctamente.")
+        Catch ex As Exception
+            Throw New Exception("Error al guardar el documento en la base de datos: " & ex.Message)
+        End Try
+    End Sub
+
+
+
 
 End Class

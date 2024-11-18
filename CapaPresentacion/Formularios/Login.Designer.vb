@@ -25,7 +25,7 @@ Partial Class Login
         Me.label1 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.txtUsuario = New System.Windows.Forms.TextBox()
-        Me.txtContrasena = New System.Windows.Forms.TextBox()
+        Me.txtPassword = New System.Windows.Forms.TextBox()
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.btnIniciarSesion = New System.Windows.Forms.Button()
         Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
@@ -61,13 +61,13 @@ Partial Class Login
         Me.txtUsuario.Size = New System.Drawing.Size(270, 20)
         Me.txtUsuario.TabIndex = 1
         '
-        'txtContrasena
+        'txtPassword
         '
-        Me.txtContrasena.Location = New System.Drawing.Point(26, 97)
-        Me.txtContrasena.Name = "txtContrasena"
-        Me.txtContrasena.Size = New System.Drawing.Size(270, 20)
-        Me.txtContrasena.TabIndex = 2
-        Me.txtContrasena.UseSystemPasswordChar = True
+        Me.txtPassword.Location = New System.Drawing.Point(26, 97)
+        Me.txtPassword.Name = "txtPassword"
+        Me.txtPassword.Size = New System.Drawing.Size(270, 20)
+        Me.txtPassword.TabIndex = 2
+        Me.txtPassword.UseSystemPasswordChar = True
         '
         'Panel1
         '
@@ -76,7 +76,7 @@ Partial Class Login
         Me.Panel1.Controls.Add(Me.LinkLabel1)
         Me.Panel1.Controls.Add(Me.Label3)
         Me.Panel1.Controls.Add(Me.label1)
-        Me.Panel1.Controls.Add(Me.txtContrasena)
+        Me.Panel1.Controls.Add(Me.txtPassword)
         Me.Panel1.Controls.Add(Me.txtUsuario)
         Me.Panel1.Controls.Add(Me.Label2)
         Me.Panel1.Location = New System.Drawing.Point(51, 70)
@@ -142,7 +142,7 @@ Partial Class Login
     Friend WithEvents label1 As Label
     Friend WithEvents Label2 As Label
     Friend WithEvents txtUsuario As TextBox
-    Friend WithEvents txtContrasena As TextBox
+    Friend WithEvents txtPassword As TextBox
     Friend WithEvents Panel1 As Panel
     Friend WithEvents Label3 As Label
     Friend WithEvents btnIniciarSesion As Button

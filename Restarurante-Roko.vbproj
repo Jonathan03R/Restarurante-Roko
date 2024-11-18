@@ -453,6 +453,7 @@
     <Content Include="ascents\iconos\pdf.ico" />
     <Content Include="ascents\imagenes\pdf.png" />
     <Content Include="ascents\imagenes\Restaurante.jpg" />
+    <Content Include="CapaPersistencia\ModuloPrincipal\Datos2_GrupoN_BaseDeDatosRestauranteRoko.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

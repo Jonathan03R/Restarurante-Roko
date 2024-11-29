@@ -155,5 +155,7 @@
         End Try
     End Sub
 
+    Private Sub ReservasBox_Enter(sender As Object, e As EventArgs) Handles ReservasBox.Enter
 
+    End Sub
 End Class

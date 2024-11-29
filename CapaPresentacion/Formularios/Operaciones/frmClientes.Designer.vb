@@ -23,6 +23,14 @@ Partial Class frmClientes
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.tabla = New System.Windows.Forms.DataGridView()
+        Me.ClientesCodigo = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Reservas = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ClientesNombre = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ClientesApellidos = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ClientesTelefono = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ClientesDNI = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ClientesCorreo = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ClientesFechaRegistro = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.btnrestore = New System.Windows.Forms.Button()
         Me.btndelete = New System.Windows.Forms.Button()
         Me.btnActualizar = New System.Windows.Forms.Button()
@@ -44,19 +52,11 @@ Partial Class frmClientes
         Me.btnGuardar = New System.Windows.Forms.Button()
         Me.generarCodigo = New System.Windows.Forms.Button()
         Me.tablaReservas = New System.Windows.Forms.DataGridView()
-        Me.ReservasBox = New System.Windows.Forms.GroupBox()
-        Me.ClientesCodigo = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Reservas = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.ClientesNombre = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.ClientesApellidos = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.ClientesTelefono = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.ClientesDNI = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.ClientesCorreo = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.ClientesFechaRegistro = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Column1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Column4 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Column3 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Column2 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ReservasBox = New System.Windows.Forms.GroupBox()
         CType(Me.tabla, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox1.SuspendLayout()
         CType(Me.tablaReservas, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -76,6 +76,62 @@ Partial Class frmClientes
         Me.tabla.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
         Me.tabla.Size = New System.Drawing.Size(603, 211)
         Me.tabla.TabIndex = 47
+        '
+        'ClientesCodigo
+        '
+        Me.ClientesCodigo.DataPropertyName = "ClientesCodigo"
+        Me.ClientesCodigo.HeaderText = "Codigo"
+        Me.ClientesCodigo.Name = "ClientesCodigo"
+        Me.ClientesCodigo.ReadOnly = True
+        '
+        'Reservas
+        '
+        Me.Reservas.DataPropertyName = "Reservas"
+        Me.Reservas.HeaderText = "Reservas"
+        Me.Reservas.Name = "Reservas"
+        Me.Reservas.ReadOnly = True
+        '
+        'ClientesNombre
+        '
+        Me.ClientesNombre.DataPropertyName = "ClientesNombre"
+        Me.ClientesNombre.HeaderText = "Nombres"
+        Me.ClientesNombre.Name = "ClientesNombre"
+        Me.ClientesNombre.ReadOnly = True
+        '
+        'ClientesApellidos
+        '
+        Me.ClientesApellidos.DataPropertyName = "ClientesApellidos"
+        Me.ClientesApellidos.HeaderText = "Apellidos"
+        Me.ClientesApellidos.Name = "ClientesApellidos"
+        Me.ClientesApellidos.ReadOnly = True
+        '
+        'ClientesTelefono
+        '
+        Me.ClientesTelefono.DataPropertyName = "ClientesTelefono"
+        Me.ClientesTelefono.HeaderText = "Télefono"
+        Me.ClientesTelefono.Name = "ClientesTelefono"
+        Me.ClientesTelefono.ReadOnly = True
+        '
+        'ClientesDNI
+        '
+        Me.ClientesDNI.DataPropertyName = "ClientesDNI"
+        Me.ClientesDNI.HeaderText = "dni"
+        Me.ClientesDNI.Name = "ClientesDNI"
+        Me.ClientesDNI.ReadOnly = True
+        '
+        'ClientesCorreo
+        '
+        Me.ClientesCorreo.DataPropertyName = "ClientesCorreo"
+        Me.ClientesCorreo.HeaderText = "Correo"
+        Me.ClientesCorreo.Name = "ClientesCorreo"
+        Me.ClientesCorreo.ReadOnly = True
+        '
+        'ClientesFechaRegistro
+        '
+        Me.ClientesFechaRegistro.DataPropertyName = "ClientesFechaRegistro"
+        Me.ClientesFechaRegistro.HeaderText = "Fecha registro"
+        Me.ClientesFechaRegistro.Name = "ClientesFechaRegistro"
+        Me.ClientesFechaRegistro.ReadOnly = True
         '
         'btnrestore
         '
@@ -286,72 +342,6 @@ Partial Class frmClientes
         Me.tablaReservas.Size = New System.Drawing.Size(437, 170)
         Me.tablaReservas.TabIndex = 51
         '
-        'ReservasBox
-        '
-        Me.ReservasBox.Controls.Add(Me.tablaReservas)
-        Me.ReservasBox.Location = New System.Drawing.Point(510, 31)
-        Me.ReservasBox.Name = "ReservasBox"
-        Me.ReservasBox.Size = New System.Drawing.Size(492, 281)
-        Me.ReservasBox.TabIndex = 52
-        Me.ReservasBox.TabStop = False
-        Me.ReservasBox.Text = "Reservas del Clientes"
-        '
-        'ClientesCodigo
-        '
-        Me.ClientesCodigo.DataPropertyName = "ClientesCodigo"
-        Me.ClientesCodigo.HeaderText = "Codigo"
-        Me.ClientesCodigo.Name = "ClientesCodigo"
-        Me.ClientesCodigo.ReadOnly = True
-        '
-        'Reservas
-        '
-        Me.Reservas.DataPropertyName = "Reservas"
-        Me.Reservas.HeaderText = "Reservas"
-        Me.Reservas.Name = "Reservas"
-        Me.Reservas.ReadOnly = True
-        '
-        'ClientesNombre
-        '
-        Me.ClientesNombre.DataPropertyName = "ClientesNombre"
-        Me.ClientesNombre.HeaderText = "Nombres"
-        Me.ClientesNombre.Name = "ClientesNombre"
-        Me.ClientesNombre.ReadOnly = True
-        '
-        'ClientesApellidos
-        '
-        Me.ClientesApellidos.DataPropertyName = "ClientesApellidos"
-        Me.ClientesApellidos.HeaderText = "Apellidos"
-        Me.ClientesApellidos.Name = "ClientesApellidos"
-        Me.ClientesApellidos.ReadOnly = True
-        '
-        'ClientesTelefono
-        '
-        Me.ClientesTelefono.DataPropertyName = "ClientesTelefono"
-        Me.ClientesTelefono.HeaderText = "Télefono"
-        Me.ClientesTelefono.Name = "ClientesTelefono"
-        Me.ClientesTelefono.ReadOnly = True
-        '
-        'ClientesDNI
-        '
-        Me.ClientesDNI.DataPropertyName = "ClientesDNI"
-        Me.ClientesDNI.HeaderText = "dni"
-        Me.ClientesDNI.Name = "ClientesDNI"
-        Me.ClientesDNI.ReadOnly = True
-        '
-        'ClientesCorreo
-        '
-        Me.ClientesCorreo.DataPropertyName = "ClientesCorreo"
-        Me.ClientesCorreo.HeaderText = "Correo"
-        Me.ClientesCorreo.Name = "ClientesCorreo"
-        Me.ClientesCorreo.ReadOnly = True
-        '
-        'ClientesFechaRegistro
-        '
-        Me.ClientesFechaRegistro.DataPropertyName = "ClientesFechaRegistro"
-        Me.ClientesFechaRegistro.HeaderText = "Fecha registro"
-        Me.ClientesFechaRegistro.Name = "ClientesFechaRegistro"
-        Me.ClientesFechaRegistro.ReadOnly = True
-        '
         'Column1
         '
         Me.Column1.DataPropertyName = "ReservasCodigo"
@@ -375,6 +365,16 @@ Partial Class frmClientes
         Me.Column2.DataPropertyName = "ReservasMesasCodigo"
         Me.Column2.HeaderText = "Codigo Mesa"
         Me.Column2.Name = "Column2"
+        '
+        'ReservasBox
+        '
+        Me.ReservasBox.Controls.Add(Me.tablaReservas)
+        Me.ReservasBox.Location = New System.Drawing.Point(510, 31)
+        Me.ReservasBox.Name = "ReservasBox"
+        Me.ReservasBox.Size = New System.Drawing.Size(492, 281)
+        Me.ReservasBox.TabIndex = 52
+        Me.ReservasBox.TabStop = False
+        Me.ReservasBox.Text = "Reservas del Clientes"
         '
         'frmClientes
         '

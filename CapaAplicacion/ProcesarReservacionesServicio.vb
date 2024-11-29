@@ -59,16 +59,12 @@
 
     ' Método para obtener una lista de reservas como DataTable
     Public Function ObtenerReservas(Optional estados As String = Nothing) As DataTable
-        Try
-            ' Obtener reservas desde la capa de persistencia
-            ModuloSistema.IniciarTransaccion()
-            Dim result As DataTable = reservaSQL.ObtenerReservasComoDataTable(estados)
-            ModuloSistema.TerminarTransaccion()
-            Return result
-        Catch ex As Exception
-            ModuloSistema.CancelarTransaccion()
-            Throw ex
-        End Try
+
+        ModuloSistema.AbrirConexion()
+        Dim result As DataTable = reservaSQL.ObtenerReservasComoDataTable(estados)
+        ModuloSistema.CerrarConexion()
+        Return result
+
     End Function
 
     ' Método para obtener una lista de mesas disponibles como DataTable

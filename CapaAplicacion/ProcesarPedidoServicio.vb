@@ -46,15 +46,10 @@ Public Class ProcesarPedidoServicio
 
     'luego se lista el menu de este pedido
     Public Function ListarMenuActivo() As List(Of Menu)
-        Try
-            ModuloSistema.IniciarTransaccion()
-            Dim listaMenuActiva As List(Of Menu) = menuSQL.ListarMenuActivo()
-            ModuloSistema.TerminarTransaccion()
-            Return listaMenuActiva
-        Catch ex As Exception
-            ModuloSistema.CancelarTransaccion()
-            Throw New Exception("Error al listar el menú activo: " & ex.Message)
-        End Try
+        ModuloSistema.AbrirConexion()
+        Dim listaMenuActiva As List(Of Menu) = menuSQL.ListarMenuActivo()
+        ModuloSistema.CerrarConexion()
+        Return listaMenuActiva
     End Function
 
     'luego segun las elecciones se agrega un detalle pedido: 

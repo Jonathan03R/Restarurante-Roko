@@ -178,7 +178,7 @@ Partial Class frmMesas
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(497, 419)
+        Me.ClientSize = New System.Drawing.Size(494, 419)
         Me.Controls.Add(Me.mostrar)
         Me.Controls.Add(Me.mostrarEliminados)
         Me.Controls.Add(Me.tablaMesas)
